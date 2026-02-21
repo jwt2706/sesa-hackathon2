@@ -1,6 +1,5 @@
 import TradeHeatmap from '../trade_analysis/tradeHeatmap';
 import PLCard from '../components/analysis/PLCard';
-import PLByMonthHeatmap from '../components/analysis/PLByMonthHeatmap';
 import DayOfMonthSummary from '../components/analysis/DayOfMonthSummary';
 import { Trade, BiasAnalysisResult } from '../types/trade';
 
@@ -44,10 +43,6 @@ export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-4">Trading Activity Heatmap</h3>
           <TradeHeatmap trades={trades} />
-        </div>
-        <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-4">Profit/Loss Heatmap</h3>
-          <PLByMonthHeatmap trades={trades} />
         </div>
       </div>
 
