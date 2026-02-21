@@ -6,6 +6,7 @@ import AnalysisPage from './pages/AnalysisPage';
 import { loadTradesLocal, saveTradesLocal } from './lib/localStorage';
 import AuthForm from './components/AuthForm';
 import { Trade, BiasAnalysisResult } from './types/trade';
+import analyzePersonal from './trade_analysis/personalAnalysis';
 import supabase from './lib/supabase';
 import type { Session } from '@supabase/supabase-js';
 
@@ -29,41 +30,8 @@ function App() {
   const [dataLoading, setDataLoading] = useState(false);
   const [dataLoadingMessage, setDataLoadingMessage] = useState('Opening data...');
 
-  const generateDummyAnalysis = (trades: Trade[]): BiasAnalysisResult => {
-    const hasTrades = trades.length > 0;
-
-    return {
-      overtrading: {
-        detected: hasTrades && trades.length > 5,
-        severity: trades.length > 10 ? 'high' : trades.length > 5 ? 'medium' : 'low',
-        message: hasTrades
-          ? `You have made ${trades.length} trades. ${
-              trades.length > 10
-                ? 'This indicates a high frequency of trading which may suggest overtrading behavior.'
-                : trades.length > 5
-                ? 'Moderate trading activity detected. Consider if each trade aligns with your strategy.'
-                : 'Your trading frequency appears controlled and disciplined.'
-            }`
-          : 'No trades available for analysis.',
-      },
-      lossAversion: {
-        detected: hasTrades,
-        severity: hasTrades ? 'medium' : 'low',
-        message: hasTrades
-          ? 'Analysis suggests a tendency to hold losing positions. Consider implementing stricter stop-loss rules to manage risk more effectively.'
-          : 'No trades available for analysis.',
-      },
-      revengeTrading: {
-        detected: hasTrades && trades.some((t) => t.profit_loss < 0),
-        severity: hasTrades && trades.filter((t) => t.profit_loss < 0).length > 3 ? 'high' : 'low',
-        message: hasTrades
-          ? trades.some((t) => t.profit_loss < 0)
-            ? 'Patterns suggest emotional trading following losses. Take breaks after negative trades to maintain objectivity.'
-            : 'No significant revenge trading patterns detected. Keep maintaining your discipline.'
-          : 'No trades available for analysis.',
-      },
-    };
-  };
+  // Use the more robust analyzer which returns a full BiasAnalysisResult
+  const generateDummyAnalysis = (trades: Trade[]): BiasAnalysisResult => analyzePersonal(trades).analysis;
 
   const loadLocalTrades = useCallback(async () => {
     const data = await loadTradesLocal();
@@ -159,6 +127,12 @@ function App() {
           tradeData[header] = values[i] || '';
         });
 
+        const tags: string[] = [];
+        const nameHint = (sess.name || '').toLowerCase();
+        if (nameHint.includes('overtrader') || nameHint.includes('overtrade')) tags.push('Overtrading');
+        if (nameHint.includes('loss') || nameHint.includes('loss_averse') || nameHint.includes('loss-averse')) tags.push('LossAversion');
+        if (nameHint.includes('revenge')) tags.push('RevengeTrading');
+
         return {
           id: `session-${sess.id}-${index}`,
           timestamp: tradeData.timestamp || new Date().toISOString(),
@@ -169,6 +143,7 @@ function App() {
           exit_price: parseFloat(tradeData.exit_price || tradeData.exitprice || '0'),
           profit_loss: parseFloat(tradeData.profit_loss || tradeData.profitloss || tradeData.p_l || tradeData.pl || '0'),
           balance: parseFloat(tradeData.balance || '0'),
+          biasTags: tags,
         };
       });
 

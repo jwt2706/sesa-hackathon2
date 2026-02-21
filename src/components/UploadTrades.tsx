@@ -98,6 +98,9 @@ export default function UploadTrades({ onTradesUploaded, sessions = [], onOpenSe
       const headers = splitCsvLine(lines[0]).map(normalizeHeader);
 
       let runningBalance = 0;
+      // derive simple filename hints (e.g., overtrader, loss_averse, revenge)
+      const nameHint = (file.name || '').toLowerCase();
+
       const trades: Trade[] = lines.slice(1).map((line, index) => {
         const values = splitCsvLine(line);
         const tradeData: Record<string, string> = {};
@@ -124,6 +127,11 @@ export default function UploadTrades({ onTradesUploaded, sessions = [], onOpenSe
         const balance = Math.max(0, Number.isFinite(computedBalance) ? computedBalance : 0);
         runningBalance = balance;
 
+        const tags: string[] = [];
+        if (nameHint.includes('overtrader') || nameHint.includes('overtrade')) tags.push('Overtrading');
+        if (nameHint.includes('loss') || nameHint.includes('loss_averse') || nameHint.includes('loss-averse')) tags.push('LossAversion');
+        if (nameHint.includes('revenge')) tags.push('RevengeTrading');
+
         return {
           id: `upload-${Date.now()}-${index}`,
           timestamp,
@@ -136,6 +144,7 @@ export default function UploadTrades({ onTradesUploaded, sessions = [], onOpenSe
           exit_price: Number.isFinite(exitPrice) && exitPrice > 0 ? exitPrice : 0,
           profit_loss: Number.isFinite(profitLoss) ? profitLoss : 0,
           balance,
+          biasTags: tags,
         };
       });
 
