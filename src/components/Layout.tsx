@@ -1,14 +1,15 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import FlickeringGrid from './Background';
 
 interface LayoutProps {
   children: ReactNode;
   onNavigate: (page: 'dashboard' | 'faq' | 'analysis') => void;
+  currentPage: 'dashboard' | 'faq' | 'analysis';
   userEmail?: string;
   onSignOut?: () => void | Promise<void>;
 }
 
-export default function Layout({ children, onNavigate, userEmail, onSignOut }: LayoutProps) {
+export default function Layout({ children, onNavigate, currentPage, userEmail, onSignOut }: LayoutProps) {
   return (
     <div className="relative min-h-screen">
       <FlickeringGrid className="absolute inset-0 -z-10" />
@@ -25,10 +26,10 @@ export default function Layout({ children, onNavigate, userEmail, onSignOut }: L
 
             <nav className="flex items-center space-x-4">
               <button
-                onClick={() => onNavigate('faq')}
+                onClick={() => onNavigate(currentPage === 'faq' ? 'dashboard' : 'faq')}
                 className="px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium font-semibold border-2 border-red-700 hover:from-red-600 hover:to-red-700 transition-all shadow-lg shadow-red-500/40"
               >
-                Learn More
+                {currentPage === 'faq' ? 'Dashboard' : 'Learn More'}
               </button>
               {userEmail ? <span className="text-sm text-gray-700 hidden xl:inline font-medium">{userEmail}</span> : null}
               {onSignOut ? (

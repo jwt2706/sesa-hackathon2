@@ -316,6 +316,7 @@ function App() {
 
   return (
     <Layout
+      currentPage={currentPage}
       onNavigate={setCurrentPage}
       onSignOut={handleSignOut}
       userEmail={session.user.email || ''}
