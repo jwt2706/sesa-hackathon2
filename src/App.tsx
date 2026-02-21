@@ -5,13 +5,16 @@ import ManualTradeEntry from './components/ManualTradeEntry';
 import TradesTable from './components/TradesTable';
 import AnalysisDashboard from './components/AnalysisDashboard';
 import FAQPage from './components/FAQPage';
+import AnalysisPage from './pages/AnalysisPage';
+import { Trade, BiasAnalysisResult } from './types/trade';
+import { loadTradesLocal, appendTradesLocal, saveTradesLocal } from './lib/localStorage';
 import AuthForm from './components/AuthForm';
 import { Trade, BiasAnalysisResult } from './types/trade';
 import { supabase } from './lib/supabase';
 import type { Session } from '@supabase/supabase-js';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'dashboard' | 'faq'>('dashboard');
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'faq' | 'analysis'>('dashboard');
   const [trades, setTrades] = useState<Trade[]>([]);
   const [analysis, setAnalysis] = useState<BiasAnalysisResult | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -55,6 +58,10 @@ function App() {
     };
   };
 
+  const loadTrades = async () => {
+    const data = await loadTradesLocal();
+    setTrades(data);
+    setAnalysis(generateDummyAnalysis(data));
   const loadTrades = async (userId: string) => {
     const { data, error } = await supabase
       .from('trades')
@@ -140,23 +147,14 @@ function App() {
   };
 
   const handleTradesUploaded = async (newTrades: Trade[]) => {
-    const { error } = await supabase.from('trades').insert(
-      newTrades.map((trade) => ({
-        timestamp: trade.timestamp,
-        asset: trade.asset,
-        side: trade.side,
-        quantity: trade.quantity,
-        entry_price: trade.entry_price,
-        exit_price: trade.exit_price,
-        profit_loss: trade.profit_loss,
-        balance: trade.balance,
-      }))
-    );
-
-    if (error) {
-      console.error('Error saving trades:', error);
-      alert('Error saving trades. Please try again.');
-      return;
+    try {
+      // append to local storage and reload
+      await appendTradesLocal(newTrades);
+      await loadTrades();
+      setCurrentPage('analysis');
+    } catch (e) {
+      console.error('Error saving trades locally:', e);
+      alert('Error saving trades locally. Please try again.');
     }
 
     if (session?.user?.id) {
@@ -165,21 +163,12 @@ function App() {
   };
 
   const handleTradeAdded = async (trade: Trade) => {
-    const { error } = await supabase.from('trades').insert({
-      timestamp: trade.timestamp,
-      asset: trade.asset,
-      side: trade.side,
-      quantity: trade.quantity,
-      entry_price: trade.entry_price,
-      exit_price: trade.exit_price,
-      profit_loss: trade.profit_loss,
-      balance: trade.balance,
-    });
-
-    if (error) {
-      console.error('Error adding trade:', error);
-      alert('Error adding trade. Please try again.');
-      return;
+    try {
+      await appendTradesLocal([trade]);
+      await loadTrades();
+    } catch (e) {
+      console.error('Error adding trade locally:', e);
+      alert('Error adding trade locally.');
     }
 
     if (session?.user?.id) {
@@ -224,6 +213,8 @@ function App() {
 
           <TradesTable trades={trades} />
         </div>
+      ) : currentPage === 'analysis' ? (
+        <AnalysisPage trades={trades} analysis={analysis} />
       ) : (
         <FAQPage />
       )}

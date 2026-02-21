@@ -2,8 +2,8 @@ import { ReactNode } from 'react';
 
 interface LayoutProps {
   children: ReactNode;
-  onNavigate: (page: 'dashboard' | 'faq') => void;
-  currentPage: 'dashboard' | 'faq';
+  onNavigate: (page: 'dashboard' | 'faq' | 'analysis') => void;
+  currentPage: 'dashboard' | 'faq' | 'analysis';
   userEmail?: string;
   onSignOut?: () => void | Promise<void>;
 }
@@ -34,6 +34,16 @@ export default function Layout({ children, onNavigate, currentPage, userEmail, o
                 }`}
               >
                 Dashboard
+              </button>
+              <button
+                onClick={() => onNavigate('analysis')}
+                className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                  currentPage === 'analysis'
+                    ? 'bg-white/20 text-white backdrop-blur-md border border-white/30'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                Analysis
               </button>
               <button
                 onClick={() => onNavigate('faq')}

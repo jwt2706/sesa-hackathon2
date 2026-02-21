@@ -1,15 +1,33 @@
 // types.ts
 export interface Trade {
+  id: string;
   timestamp: string; // e.g. "2025-03-01 09:30:00"
   asset: string;
-  side: string;
+  side: 'buy' | 'sell' | string;
   quantity: number;
   entry_price: number;
   exit_price: number;
   profit_loss: number;
   balance: number;
-  day?: string; // Add if not present
-  hour?: number; // Add if not present
+  // derived / optional fields
+  day?: string; // e.g. "2025-03-01"
+  hour?: number; // 0-23
+  dateObj?: Date;
+  monthKey?: string; // e.g. "2025-03"
+  dayOfMonth?: number; // 1-31
+  biasTags?: string[];
+}
+
+export interface BiasResultItem {
+  detected: boolean;
+  severity: 'low' | 'medium' | 'high' | string;
+  message: string;
+}
+
+export interface BiasAnalysisResult {
+  overtrading: BiasResultItem;
+  lossAversion: BiasResultItem;
+  revengeTrading: BiasResultItem;
 }
 
 export interface BiasDetection {
