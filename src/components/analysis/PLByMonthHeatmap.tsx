@@ -2,7 +2,8 @@ import React from 'react';
 import { Trade } from '../../types/trade';
 import { preparePLHeatmapData } from '../../trade_analysis/aggregations';
 
-const ramp = ['#0f172a', '#065f46', '#16a34a', '#a3e635', '#facc15', '#f97316', '#b91c1c'];
+const positiveRamp = ['#f0fdf4', '#dcfce7', '#bbf7d0', '#86efac', '#4ade80', '#22c55e', '#16a34a'];
+const negativeRamp = ['#fef2f2', '#fee2e2', '#fecaca', '#fca5a5', '#f87171', '#ef4444', '#dc2626'];
 
 function hexToRgbLocal(hex: string) {
   const h = hex.replace('#', '');
@@ -17,26 +18,26 @@ function luminanceLocal(hex: string) {
 
 const colorFor = (v: number) => {
   if (v === 0) return '#f1f5f9';
-  const idx = Math.min(ramp.length - 1, Math.floor(Math.abs(v) / 100) + 1);
-  return v > 0 ? ramp[Math.max(1, idx)] : ramp[ramp.length - 1];
+  const idx = Math.min(positiveRamp.length - 1, Math.floor(Math.abs(v) / 100) + 1);
+  return v > 0 ? positiveRamp[idx] : negativeRamp[idx];
 };
 
 const PLByMonthHeatmap = ({ trades }: { trades: Trade[] }) => {
   const { data, keys } = preparePLHeatmapData(trades);
 
   return (
-    <div style={{ background: '#071025', padding: 14, borderRadius: 10 }}>
+    <div style={{ background: 'rgba(255,255,255,0.75)', border: '2px solid #d1d5db', padding: 14, borderRadius: 10 }}>
       <h3 className="text-black font-bold mb-2">P/L by Month & Day</h3>
       <div style={{ overflowX: 'auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: `100px repeat(${keys.length}, 128px)`, gap: 10 }}>
           <div />
           {keys.map(k => (
-            <div key={`k-${k}`} style={{ color: '#bbb', fontSize: 14, textAlign: 'center', padding: '6px 4px' }}>{k}</div>
+            <div key={`k-${k}`} style={{ color: '#4b5563', fontSize: 14, textAlign: 'center', padding: '6px 4px', fontWeight: 600 }}>{k}</div>
           ))}
 
           {data.map((row) => (
             <React.Fragment key={row.day}>
-              <div style={{ color: '#fff', fontSize: 14, paddingTop: 8 }}>{row.day}</div>
+              <div style={{ color: '#111827', fontSize: 14, paddingTop: 8, fontWeight: 600 }}>{row.day}</div>
               {keys.map(k => {
                 const v = (row as any)[k] || 0;
                 const bg = colorFor(v);

@@ -74,7 +74,7 @@ const TradeHeatmap = ({ trades }: { trades: Trade[] }) => {
     height: squareSize,
     borderRadius: 4,
     boxSizing: 'border-box',
-    border: '1px solid rgba(255,255,255,0.06)',
+    border: '1px solid rgba(156,163,175,0.45)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -138,17 +138,17 @@ const TradeHeatmap = ({ trades }: { trades: Trade[] }) => {
     if (type === 'count') {
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-          <div style={{ color: '#bbb', fontSize: 12 }}>0</div>
+          <div style={{ color: '#4b5563', fontSize: 12, fontWeight: 600 }}>0</div>
           <div style={{ height: 12, flex: 1, borderRadius: 6, background: `linear-gradient(90deg, #fff7f7, ${darkRed})` }} />
-          <div style={{ color: '#bbb', fontSize: 12 }}>{maxCount}</div>
+          <div style={{ color: '#4b5563', fontSize: 12, fontWeight: 600 }}>{maxCount}</div>
         </div>
       );
     }
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-        <div style={{ color: '#bbb', fontSize: 12 }}>−{maxAbsPL.toFixed(0)}</div>
+        <div style={{ color: '#4b5563', fontSize: 12, fontWeight: 600 }}>−{maxAbsPL.toFixed(0)}</div>
         <div style={{ height: 12, flex: 1, borderRadius: 6, background: `linear-gradient(90deg, ${lightRed}, #fff, ${lightGreen})` }} />
-        <div style={{ color: '#bbb', fontSize: 12 }}>+{maxAbsPL.toFixed(0)}</div>
+        <div style={{ color: '#4b5563', fontSize: 12, fontWeight: 600 }}>+{maxAbsPL.toFixed(0)}</div>
       </div>
     );
   };
@@ -156,15 +156,15 @@ const TradeHeatmap = ({ trades }: { trades: Trade[] }) => {
   const gridColStyle = { display: 'grid', gridTemplateRows: `repeat(7, ${squareSize}px)`, rowGap: gap, columnGap: gap, marginRight: gap } as React.CSSProperties;
 
   return (
-    <div style={{ backgroundColor: '#071124', borderRadius: 10, padding: 16, color: '#fff' }}>
-      <div style={{ marginBottom: 8, color: '#cbd5e1', fontSize: 13 }}>
-        <strong style={{ color: '#fff' }}>Data summary:</strong> {trades.length} trades, {uniqueDatesCount} days with activity
+    <div style={{ backgroundColor: 'rgba(255,255,255,0.75)', border: '2px solid #d1d5db', borderRadius: 10, padding: 16, color: '#111827' }}>
+      <div style={{ marginBottom: 8, color: '#4b5563', fontSize: 13 }}>
+        <strong style={{ color: '#111827' }}>Data summary:</strong> {trades.length} trades, {uniqueDatesCount} days with activity
         {presentDates.length > 0 ? ` — sample: ${presentDates.slice(0,5).join(', ')}` : ''}
       </div>
-      <h3 style={{ marginBottom: 12, fontSize: 16 }}>Trading Activity Heatmap</h3>
+      <h3 style={{ marginBottom: 12, fontSize: 16, color: '#111827' }}>Trading Activity Heatmap</h3>
 
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
-        <div style={{ display: 'grid', gridTemplateRows: `repeat(7, ${squareSize}px)`, rowGap: gap, color: '#9ca3af', fontSize: 14 }}>
+        <div style={{ display: 'grid', gridTemplateRows: `repeat(7, ${squareSize}px)`, rowGap: gap, color: '#6b7280', fontSize: 14, fontWeight: 600 }}>
           {dayLabels.map(d => <div key={d} style={{ height: squareSize, display: 'flex', alignItems: 'center' }}>{d}</div>)}
         </div>
         <div style={{ display: 'flex' }}>
@@ -181,9 +181,9 @@ const TradeHeatmap = ({ trades }: { trades: Trade[] }) => {
       </div>
       <Legend type="count" />
 
-      <h3 style={{ margin: '16px 0 8px', fontSize: 16 }}>Profit &amp; Loss (daily sum)</h3>
+      <h3 style={{ margin: '16px 0 8px', fontSize: 16, color: '#111827' }}>Profit &amp; Loss (daily sum)</h3>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, overflowX: 'auto' }}>
-        <div style={{ display: 'grid', gridTemplateRows: `repeat(7, ${squareSize}px)`, rowGap: gap, color: '#9ca3af', fontSize: 12 }}>
+        <div style={{ display: 'grid', gridTemplateRows: `repeat(7, ${squareSize}px)`, rowGap: gap, color: '#6b7280', fontSize: 12, fontWeight: 600 }}>
           {dayLabels.map(d => <div key={`p-${d}`} style={{ height: squareSize, display: 'flex', alignItems: 'center' }}>{d}</div>)}
         </div>
         <div style={{ display: 'flex' }}>
