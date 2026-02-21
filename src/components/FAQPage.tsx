@@ -1,11 +1,11 @@
-import { HelpCircle } from 'lucide-react';
+import { FaQuestionCircle } from 'react-icons/fa';
 
 export default function FAQPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-8 shadow-xl text-center">
         <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-500/30">
-          <HelpCircle className="w-10 h-10 text-white" />
+          <FaQuestionCircle className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-white mb-4">Frequently Asked Questions</h1>
         <p className="text-white/60 text-lg">
@@ -67,7 +67,7 @@ export default function FAQPage() {
       <div className="backdrop-blur-md bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-500/30 rounded-2xl p-6 shadow-xl">
         <div className="flex items-start space-x-4">
           <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-red-500/30">
-            <HelpCircle className="w-6 h-6 text-white" />
+            <FaQuestionCircle className="w-6 h-6 text-white" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-white mb-2">Need More Help?</h3>

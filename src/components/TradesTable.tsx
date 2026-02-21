@@ -1,4 +1,4 @@
-import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 import { Trade } from '../types/trade';
 
 interface TradesTableProps {
@@ -88,9 +88,9 @@ export default function TradesTable({ trades }: TradesTableProps) {
                     }`}
                   >
                     {trade.side === 'buy' ? (
-                      <ArrowUpRight className="w-3 h-3 mr-1" />
+                      <FaArrowUp className="w-3 h-3 mr-1" />
                     ) : (
-                      <ArrowDownRight className="w-3 h-3 mr-1" />
+                      <FaArrowDown className="w-3 h-3 mr-1" />
                     )}
                     {trade.side.toUpperCase()}
                   </span>
