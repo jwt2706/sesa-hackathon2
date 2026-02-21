@@ -81,9 +81,36 @@ function App() {
       return;
     }
 
-    if (remoteData) {
-      setTrades(remoteData as Trade[]);
-      setAnalysis(generateDummyAnalysis(remoteData as Trade[]));
+    // Merge remote data with locally uploaded (unsynced) trades so the UI shows uploads immediately
+    try {
+      const local = await loadTradesLocal();
+      if (remoteData) {
+        const remote = remoteData as Trade[];
+        // Keep local (new) trades first, then append remote trades that don't appear to be duplicates
+        const combined = [...local];
+        for (const r of remote) {
+          const exists = combined.some((l) =>
+            l.timestamp === r.timestamp &&
+            (l.asset || '').trim() === (r.asset || '').trim() &&
+            Number(l.quantity) === Number((r as any).quantity) &&
+            Number(l.entry_price) === Number((r as any).entry_price) &&
+            Number(l.exit_price) === Number((r as any).exit_price)
+          );
+          if (!exists) combined.push(r as Trade);
+        }
+
+        setTrades(combined);
+        setAnalysis(generateDummyAnalysis(combined));
+      } else {
+        setTrades(local);
+        setAnalysis(generateDummyAnalysis(local));
+      }
+    } catch (err) {
+      console.error('Error merging remote and local trades:', err);
+      if (remoteData) {
+        setTrades(remoteData as Trade[]);
+        setAnalysis(generateDummyAnalysis(remoteData as Trade[]));
+      }
     }
   }, []);
 
@@ -117,7 +144,7 @@ function App() {
       }
 
       const text = await new Response(data).text();
-      const lines = text.split('\n').filter((l) => l.trim());
+      const lines = text.split(/\r?\n/).filter((l) => l.trim());
       const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
 
       const tradesParsed = lines.slice(1).map((line, index) => {
@@ -238,8 +265,10 @@ function App() {
 
   const handleTradesUploaded = async (newTrades: Trade[]) => {
     try {
-      await appendTradesLocal(newTrades);
-      await loadLocalTrades();
+      const merged = await appendTradesLocal(newTrades);
+      // update UI immediately from the merged local store so analysis/dashboard refreshes
+      setTrades(merged);
+      setAnalysis(generateDummyAnalysis(merged));
     } catch (e) {
       console.error('Error saving trades locally:', e);
       alert('Error saving trades locally. Please try again.');
