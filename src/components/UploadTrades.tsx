@@ -1,4 +1,4 @@
-import { Upload } from 'lucide-react';
+import { FaUpload } from 'react-icons/fa';
 import { useState } from 'react';
 import { Trade } from '../types/trade';
 
@@ -66,7 +66,7 @@ export default function UploadTrades({ onTradesUploaded }: UploadTradesProps) {
         <div className="border-2 border-dashed border-white/30 rounded-xl p-8 cursor-pointer hover:border-red-400 hover:bg-white/5 transition-all group">
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-red-500/30">
-              <Upload className="w-8 h-8 text-white" />
+              <FaUpload className="w-8 h-8 text-white" />
             </div>
             <div className="text-center">
               <p className="text-white font-medium">

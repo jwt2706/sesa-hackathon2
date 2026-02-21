@@ -1,4 +1,4 @@
-import { AlertTriangle, TrendingUp, Zap } from 'lucide-react';
+import { FaBolt, FaChartLine, FaExclamationTriangle } from 'react-icons/fa';
 import { BiasAnalysisResult } from '../types/trade';
 
 interface AnalysisDashboardProps {
@@ -44,19 +44,19 @@ export default function AnalysisDashboard({ analysis }: AnalysisDashboardProps) 
   const biases = [
     {
       name: 'Overtrading',
-      icon: Zap,
+      icon: FaBolt,
       data: analysis.overtrading,
       description: 'Excessive trading frequency or impulsive trades',
     },
     {
       name: 'Loss Aversion',
-      icon: AlertTriangle,
+      icon: FaExclamationTriangle,
       data: analysis.lossAversion,
       description: 'Holding losers too long, cutting winners too early',
     },
     {
       name: 'Revenge Trading',
-      icon: TrendingUp,
+      icon: FaChartLine,
       data: analysis.revengeTrading,
       description: 'Emotional trading after losses',
     },

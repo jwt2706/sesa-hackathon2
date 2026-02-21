@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { FaPlus } from 'react-icons/fa';
 import { useState } from 'react';
 import { Trade } from '../types/trade';
 
@@ -56,7 +56,7 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
       >
         <div className="flex items-center justify-center space-x-3">
           <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-red-500/30">
-            <Plus className="w-6 h-6 text-white" />
+            <FaPlus className="w-6 h-6 text-white" />
           </div>
           <span className="text-white font-semibold text-lg">Add Trade Manually</span>
         </div>
