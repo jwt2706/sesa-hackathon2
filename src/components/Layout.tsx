@@ -19,7 +19,7 @@ export default function Layout({ children, onNavigate, currentPage, userEmail, o
             <div className="flex items-center space-x-4">
               <img src="/BetterNBlogo.png" alt="Logo" className="h-12 w-auto drop-shadow-lg" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Bias Detector</h1>
+                <h1 className="text-2xl font-bold text-gray-900">National Bank Bias Detector</h1>
                 <p className="text-sm text-red-700 font-medium">Trading Psychology Analysis</p>
               </div>
             </div>
