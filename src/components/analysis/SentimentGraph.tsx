@@ -56,7 +56,7 @@ export default function SentimentGraph({ trades }: SentimentGraphProps) {
       <div className="flex flex-col items-center justify-center space-y-4">
         {/* Large Sentiment Icon */}
         <div className={`w-24 h-24 bg-gradient-to-br ${bgGradient} rounded-full flex items-center justify-center shadow-lg`}>
-          <Icon className="w-12 h-12 text-white" />
+          <Icon className="w-12 h-12 text-black" />
         </div>
 
         {/* Sentiment Label */}

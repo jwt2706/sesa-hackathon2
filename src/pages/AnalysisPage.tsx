@@ -31,14 +31,14 @@ interface AnalysisPageProps {
 export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
   return (
     <div className="space-y-6">
-      {/* Top Section: Total P/L and Sentiment */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Top Section: Total P/L and Sentiment (stacked) */}
+      <div className="flex flex-col space-y-6">
         <PLCard trades={trades} />
         <SentimentGraphCard trades={trades} />
       </div>
 
-      {/* Middle Section: Trade Heatmaps */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Middle Section: Trade Heatmaps (stacked) */}
+      <div className="flex flex-col space-y-6">
         <div className="backdrop-blur-xl bg-white/75 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">
           <h3 className="text-xl font-bold text-gray-900 mb-4">Trading Activity Heatmap</h3>
           <TradeHeatmap trades={trades} />
@@ -49,7 +49,7 @@ export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
         </div>
       </div>
 
-      {/* Bottom Section: Summary and Personal Notes */}
+      {/* Bottom Section: Summary and Personal Notes (stacked) */}
       <div className="space-y-6">
         <DayOfMonthSummary trades={trades} />
         <div className="backdrop-blur-xl bg-white/75 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">

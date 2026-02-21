@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Heatmap hover value styles */
+.th-count-val, .th-pl-val, .pl-val {
+	font-size: 11px;
+	color: #071124;
+	font-weight: 700;
+}
+
+.th-count-val, .th-pl-val, .pl-val { opacity: 0; }
+.th-count-val, .th-pl-val, .pl-val { transition: opacity 120ms ease-in-out; }
+
+/* Show values on hover of the parent square */
+.th-count-val, .th-pl-val { pointer-events: none; }
+.th-count-val, .th-pl-val { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+div[title][style] :hover > .th-count-val {}
+
+/* Use a small script-like selector: when hovering the square, show child span */
+div[title][style]:hover .th-count-val,
+div[title][style]:hover .th-pl-val,
+div[title][style]:hover .pl-val {
+	opacity: 1;
+}
