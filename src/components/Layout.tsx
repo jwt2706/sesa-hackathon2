@@ -10,17 +10,23 @@ interface LayoutProps {
 
 export default function Layout({ children, onNavigate, currentPage, userEmail, onSignOut }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900">
-      <header className="backdrop-blur-md bg-white/10 border-b border-white/20 sticky top-0 z-50">
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed bg-attachment-fixed"
+      style={{
+        backgroundImage: 'url(/bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <header className="backdrop-blur-xl bg-white/75 border-b-2 border-white/50 sticky top-0 z-50 shadow-lg shadow-black/20">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center backdrop-blur-lg shadow-lg shadow-red-500/50">
-                <span className="text-white font-bold text-xl">B</span>
-              </div>
+              <img src="/BetterNBlogo.png" alt="Logo" className="h-12 w-auto drop-shadow-lg" />
               <div>
-                <h1 className="text-2xl font-bold text-white">Bias Detector</h1>
-                <p className="text-sm text-red-200">Trading Psychology Analysis</p>
+                <h1 className="text-2xl font-bold text-gray-900">Bias Detector</h1>
+                <p className="text-sm text-red-700 font-medium">Trading Psychology Analysis</p>
               </div>
             </div>
 
@@ -29,8 +35,8 @@ export default function Layout({ children, onNavigate, currentPage, userEmail, o
                 onClick={() => onNavigate('dashboard')}
                 className={`px-6 py-2 rounded-lg font-medium transition-all ${
                   currentPage === 'dashboard'
-                    ? 'bg-white/20 text-white backdrop-blur-md border border-white/30'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    ? 'bg-white/35 text-gray-900 backdrop-blur-md border-2 border-red-500 shadow-md'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-white/20 border-2 border-transparent'
                 }`}
               >
                 Dashboard
@@ -47,15 +53,15 @@ export default function Layout({ children, onNavigate, currentPage, userEmail, o
               </button>
               <button
                 onClick={() => onNavigate('faq')}
-                className="px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition-all shadow-lg shadow-red-500/30"
+                className="px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium font-semibold border-2 border-red-700 hover:from-red-600 hover:to-red-700 transition-all shadow-lg shadow-red-500/40"
               >
                 Learn More
               </button>
-              {userEmail ? <span className="text-sm text-white/70 hidden xl:inline">{userEmail}</span> : null}
+              {userEmail ? <span className="text-sm text-gray-700 hidden xl:inline font-medium">{userEmail}</span> : null}
               {onSignOut ? (
                 <button
                   onClick={onSignOut}
-                  className="px-4 py-2 rounded-lg border border-white/30 text-white/90 hover:bg-white/10 transition-all"
+                  className="px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-900 hover:bg-white/40 transition-all backdrop-blur-md bg-white/25 font-medium shadow-md hover:shadow-lg"
                 >
                   Sign Out
                 </button>

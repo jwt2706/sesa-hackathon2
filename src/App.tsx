@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import Layout from './components/Layout';
 import UploadTrades from './components/UploadTrades';
-import ManualTradeEntry from './components/ManualTradeEntry';
-import TradesTable from './components/TradesTable';
-import AnalysisDashboard from './components/AnalysisDashboard';
 import FAQPage from './components/FAQPage';
 import AnalysisPage from './pages/AnalysisPage';
 import { loadTradesLocal, appendTradesLocal } from './lib/localStorage';
@@ -225,15 +222,10 @@ function App() {
   return (
     <Layout currentPage={currentPage} onNavigate={setCurrentPage} onSignOut={handleSignOut} userEmail={session.user.email || ''}>
       {currentPage === 'dashboard' ? (
-        <div className="space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-8 flex flex-col items-center">
+          <div className="w-full max-w-2xl">
             <UploadTrades onTradesUploaded={handleTradesUploaded} />
-            <ManualTradeEntry onTradeAdded={handleTradeAdded} />
           </div>
-
-          <AnalysisDashboard analysis={analysis} />
-
-          <TradesTable trades={trades} />
         </div>
       ) : currentPage === 'analysis' ? (
         <AnalysisPage trades={trades} analysis={analysis} />
