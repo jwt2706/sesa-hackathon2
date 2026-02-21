@@ -8,11 +8,19 @@ import FAQPage from './components/FAQPage';
 import AnalysisPage from './pages/AnalysisPage';
 import { Trade, BiasAnalysisResult } from './types/trade';
 import { loadTradesLocal, appendTradesLocal, saveTradesLocal } from './lib/localStorage';
+import AuthForm from './components/AuthForm';
+import { Trade, BiasAnalysisResult } from './types/trade';
+import { supabase } from './lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'dashboard' | 'faq' | 'analysis'>('dashboard');
   const [trades, setTrades] = useState<Trade[]>([]);
   const [analysis, setAnalysis] = useState<BiasAnalysisResult | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authSubmitLoading, setAuthSubmitLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const generateDummyAnalysis = (trades: Trade[]): BiasAnalysisResult => {
     const hasTrades = trades.length > 0;
@@ -54,11 +62,89 @@ function App() {
     const data = await loadTradesLocal();
     setTrades(data);
     setAnalysis(generateDummyAnalysis(data));
+  const loadTrades = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('trades')
+      .select('*')
+      .eq('user_id', userId)
+      .order('timestamp', { ascending: false });
+
+    if (error) {
+      console.error('Error loading trades:', error);
+      return;
+    }
+
+    if (data) {
+      setTrades(data);
+      setAnalysis(generateDummyAnalysis(data));
+    }
   };
 
   useEffect(() => {
-    loadTrades();
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      if (!mounted) return;
+      setSession(currentSession);
+      setAuthLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      setSession(currentSession);
+      setAuthLoading(false);
+      setAuthError(null);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
+
+  useEffect(() => {
+    if (!session?.user?.id) {
+      setTrades([]);
+      setAnalysis(null);
+      return;
+    }
+
+    loadTrades(session.user.id);
+  }, [session?.user?.id]);
+
+  const handleSignIn = async (email: string, password: string) => {
+    setAuthSubmitLoading(true);
+    setAuthError(null);
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    setAuthSubmitLoading(false);
+
+    if (error) {
+      setAuthError(error.message);
+    }
+  };
+
+  const handleSignUp = async (email: string, password: string) => {
+    setAuthSubmitLoading(true);
+    setAuthError(null);
+
+    const { error } = await supabase.auth.signUp({ email, password });
+
+    setAuthSubmitLoading(false);
+
+    if (error) {
+      setAuthError(error.message);
+      return;
+    }
+
+    setAuthError('Account created. If login did not continue automatically, sign in using your new credentials.');
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   const handleTradesUploaded = async (newTrades: Trade[]) => {
     try {
@@ -70,6 +156,10 @@ function App() {
       console.error('Error saving trades locally:', e);
       alert('Error saving trades locally. Please try again.');
     }
+
+    if (session?.user?.id) {
+      await loadTrades(session.user.id);
+    }
   };
 
   const handleTradeAdded = async (trade: Trade) => {
@@ -80,10 +170,38 @@ function App() {
       console.error('Error adding trade locally:', e);
       alert('Error adding trade locally.');
     }
+
+    if (session?.user?.id) {
+      await loadTrades(session.user.id);
+    }
   };
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 flex items-center justify-center text-white">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <AuthForm
+        onSignIn={handleSignIn}
+        onSignUp={handleSignUp}
+        loading={authSubmitLoading}
+        error={authError}
+      />
+    );
+  }
+
   return (
-    <Layout currentPage={currentPage} onNavigate={setCurrentPage}>
+    <Layout
+      currentPage={currentPage}
+      onNavigate={setCurrentPage}
+      onSignOut={handleSignOut}
+      userEmail={session.user.email || ''}
+    >
       {currentPage === 'dashboard' ? (
         <div className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
