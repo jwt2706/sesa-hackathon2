@@ -21,7 +21,7 @@ export default function UploadTrades({ onTradesUploaded }: UploadTradesProps) {
       const lines = text.split('\n').filter(line => line.trim());
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
 
-      const trades: Trade[] = lines.slice(1).map((line) => {
+      const trades: Trade[] = lines.slice(1).map((line, index) => {
         const values = line.split(',').map(v => v.trim());
         const tradeData: Record<string, string> = {};
 
@@ -30,6 +30,7 @@ export default function UploadTrades({ onTradesUploaded }: UploadTradesProps) {
         });
 
         return {
+          id: `upload-${Date.now()}-${index}`,
           timestamp: tradeData.timestamp || new Date().toISOString(),
           asset: tradeData.asset || '',
           side: (tradeData.side?.toLowerCase() === 'buy' ? 'buy' : 'sell') as 'buy' | 'sell',

@@ -1,4 +1,3 @@
-import AnalysisDashboard from '../components/AnalysisDashboard';
 import TradeHeatmap from '../trade_analysis/tradeHeatmap';
 import PLCard from '../components/analysis/PLCard';
 import PLByMonthHeatmap from '../components/analysis/PLByMonthHeatmap';
@@ -16,7 +15,6 @@ export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <PLCard trades={trades} />
         <div className="lg:col-span-2">
-          <AnalysisDashboard analysis={analysis} />
         </div>
       </div>
 
