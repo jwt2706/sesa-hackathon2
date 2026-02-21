@@ -39,7 +39,9 @@ export default function AuthForm({ onSignIn, onSignUp, loading, error }: AuthFor
     >
       <div className="w-full max-w-md bg-white/30 backdrop-blur-xl border-2 border-white/60 rounded-2xl p-8 shadow-2xl shadow-black/30">
         <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">National Bank Bias Detector</h1>
+          <img src="/BetterNBlogo.png" alt="BetterNB Logo" className="h-28 w-auto mx-auto mb-3 drop-shadow-lg" />
+          <h1 className="text-3xl font-bold text-gray-900">National Bank</h1>
+          <h2 className="text-2xl font-semibold text-gray-900">Bias Detector</h2>
           <p className="text-red-700 mt-1 font-semibold">Sign in to continue</p>
         </div>
 
