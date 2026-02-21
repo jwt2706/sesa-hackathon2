@@ -1,4 +1,5 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
+import FlickeringGrid from './Background';
 
 interface LayoutProps {
   children: ReactNode;
@@ -9,15 +10,8 @@ interface LayoutProps {
 
 export default function Layout({ children, onNavigate, userEmail, onSignOut }: LayoutProps) {
   return (
-    <div
-      className="min-h-screen bg-cover bg-center bg-fixed bg-attachment-fixed"
-      style={{
-        backgroundImage: 'url(/bg.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
-    >
+    <div className="relative min-h-screen">
+      <FlickeringGrid className="absolute inset-0 -z-10" />
       <header className="backdrop-blur-xl bg-white/75 border-b-2 border-white/50 sticky top-0 z-50 shadow-lg shadow-black/20">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
