@@ -13,7 +13,7 @@ export default function Layout({ children, onNavigate, currentPage, userEmail, o
   return (
     <div className="relative min-h-screen">
       <FlickeringGrid className="absolute inset-0 -z-10" />
-      <header className="backdrop-blur-xl bg-white/75 border-b-2 border-white/50 sticky top-0 z-50 shadow-lg shadow-black/20">
+      <header className="bg-white/75 border-b-2 border-gray-300 sticky top-0 z-50 shadow-lg shadow-black/20">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -31,11 +31,11 @@ export default function Layout({ children, onNavigate, currentPage, userEmail, o
               >
                 {currentPage === 'faq' ? 'Dashboard' : 'Learn More'}
               </button>
-              {userEmail ? <span className="text-sm text-gray-700 hidden xl:inline font-medium">{userEmail}</span> : null}
+              {userEmail ? <span className="text-sm text-gray-900 hidden xl:inline font-medium">{userEmail}</span> : null}
               {onSignOut ? (
                 <button
                   onClick={onSignOut}
-                  className="px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-900 hover:bg-white/40 transition-all backdrop-blur-md bg-white/25 font-medium shadow-md hover:shadow-lg"
+                  className="px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-900 hover:bg-white/90 transition-all bg-white/75 font-medium shadow-md hover:shadow-lg"
                 >
                   Sign Out
                 </button>

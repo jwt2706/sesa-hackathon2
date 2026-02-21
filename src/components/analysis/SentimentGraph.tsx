@@ -8,7 +8,7 @@ interface SentimentGraphProps {
 export default function SentimentGraph({ trades }: SentimentGraphProps) {
   if (!trades || trades.length === 0) {
     return (
-      <div className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl p-6 shadow-xl flex items-center justify-center">
+      <div className="bg-white/30 border-2 border-gray-300 rounded-2xl p-6 flex items-center justify-center">
         <p className="text-gray-700 font-medium">No trades to analyze sentiment</p>
       </div>
     );
@@ -50,12 +50,12 @@ export default function SentimentGraph({ trades }: SentimentGraphProps) {
   const recentTrades = trades.slice(0, 5);
 
   return (
-    <div className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">
+    <div className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl p-6">
       <h3 className="text-xl font-bold text-gray-900 mb-6">Trading Sentiment</h3>
       
       <div className="flex flex-col items-center justify-center space-y-4">
         {/* Large Sentiment Icon */}
-        <div className={`w-24 h-24 bg-gradient-to-br ${bgGradient} rounded-full flex items-center justify-center shadow-lg`}>
+        <div className={`w-24 h-24 bg-gradient-to-br ${bgGradient} rounded-full flex items-center justify-center`}>
           <Icon className="w-12 h-12 text-black" />
         </div>
 

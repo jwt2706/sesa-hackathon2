@@ -11,15 +11,15 @@ export default function PLCard({ trades }: PLCardProps) {
     `${v >= 0 ? '+' : '-'}$${Math.abs(v).toFixed(2)}`;
 
   return (
-    <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col justify-between">
+    <div className="bg-white/40 border-2 border-gray-300 rounded-xl p-6 flex flex-col justify-between">
       <div>
-        <h3 className="text-sm text-black/60 uppercase tracking-wider">Total P/L</h3>
-        <p className={`text-3xl font-extrabold mt-2 ${totalPL >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+        <h3 className="text-sm text-gray-700 uppercase tracking-wider font-bold">Total P/L</h3>
+        <p className={`text-3xl font-extrabold mt-2 ${totalPL >= 0 ? 'text-emerald-600' : 'text-red-700'}`}>
           {formatted(totalPL)}
         </p>
       </div>
 
-      <div className="mt-4 text-sm text-black/60">
+      <div className="mt-4 text-sm text-gray-700 font-medium">
         <p>{trades.length} trades analyzed</p>
       </div>
     </div>

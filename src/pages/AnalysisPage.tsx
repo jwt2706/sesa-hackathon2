@@ -10,7 +10,7 @@ function SentimentGraphCard({ trades }: { trades: Trade[] }) {
   const sentiment = winRate >= 0.6 && totalPL > 0 ? 'Positive' : winRate >= 0.4 ? 'Neutral' : 'Negative';
 
   return (
-    <div className="backdrop-blur-xl bg-white/75 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">
+    <div className="backdrop-blur-xl bg-white/75 border-2 border-gray-300 rounded-2xl p-6">
       <h3 className="text-xl font-bold text-gray-900 mb-4">Sentiment Graph</h3>
       <div className="space-y-3">
         <p className="text-gray-900 font-bold">LLM Sentiment Signal: {sentiment}</p>
@@ -30,29 +30,30 @@ interface AnalysisPageProps {
 
 export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
   return (
-    <div className="space-y-6">
-      {/* Top Section: Total P/L and Sentiment (stacked) */}
-      <div className="flex flex-col space-y-6">
+    <div className="backdrop-blur-xl bg-white/75 border-2 border-gray-300 rounded-2xl p-6 shadow-xl space-y-8">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900">Analysis Results:</h2>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8 border-b-2 border-gray-300">
         <PLCard trades={trades} />
         <SentimentGraphCard trades={trades} />
       </div>
 
-      {/* Middle Section: Trade Heatmaps (stacked) */}
-      <div className="flex flex-col space-y-6">
-        <div className="backdrop-blur-xl bg-white/75 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">
+      <div className="space-y-6 pb-8 border-b-2 border-gray-300">
+        <div>
           <h3 className="text-xl font-bold text-gray-900 mb-4">Trading Activity Heatmap</h3>
           <TradeHeatmap trades={trades} />
         </div>
-        <div className="backdrop-blur-xl bg-white/75 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">Profit/Loss by Month</h3>
+        <div>
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Profit/Loss Heatmap</h3>
           <PLByMonthHeatmap trades={trades} />
         </div>
       </div>
 
-      {/* Bottom Section: Summary and Personal Notes (stacked) */}
       <div className="space-y-6">
         <DayOfMonthSummary trades={trades} />
-        <div className="backdrop-blur-xl bg-white/75 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">
+        <div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">Personal Analysis & Recommendation</h3>
           <p className="text-gray-700 font-medium">
             {analysis
