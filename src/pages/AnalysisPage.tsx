@@ -2,6 +2,7 @@ import TradeHeatmap from '../trade_analysis/tradeHeatmap';
 import PLCard from '../components/analysis/PLCard';
 import PLByMonthHeatmap from '../components/analysis/PLByMonthHeatmap';
 import DayOfMonthSummary from '../components/analysis/DayOfMonthSummary';
+import TradeHistoryGraph from '../components/analysis/TradeHistoryGraph';
 import { Trade, BiasAnalysisResult } from '../types/trade';
 
 function SentimentGraphCard({ trades }: { trades: Trade[] }) {
@@ -38,6 +39,11 @@ export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8 border-b-2 border-gray-300">
         <PLCard trades={trades} />
         <SentimentGraphCard trades={trades} />
+      </div>
+
+      <div className="pb-8 border-b-2 border-gray-300">
+        <h3 className="text-xl font-bold text-gray-900 mb-4">Trade History & Equity Curve</h3>
+        <TradeHistoryGraph trades={trades} />
       </div>
 
       <div className="space-y-6 pb-8 border-b-2 border-gray-300">
