@@ -34,11 +34,7 @@ export default function HabitGraph({ data }: { data: Trade[] }) {
           <Tooltip 
             cursor={{ strokeDasharray: '3 3' }} 
             contentStyle={{ backgroundColor: '#333', border: 'none', color: '#fff' }}
-            formatter={(
-              value: number,
-              name: string,
-              props: { payload: { biasTags?: string[] } }
-            ) => [value, props.payload?.biasTags?.join(', ') || 'Disciplined']}
+            formatter={(value: any, _name: any, props: any) => [value, props?.payload?.biasTags?.join(', ') || 'Disciplined']}
           />
           <ReferenceLine y={0} stroke="#444" />
           <Scatter name="Trades" data={chartData}>
