@@ -1,6 +1,7 @@
 import { FaUpload } from 'react-icons/fa';
 import { useState } from 'react';
 import { Trade } from '../types/trade';
+import supabase from '../lib/supabase';
 
 interface UploadTradesProps {
   onTradesUploaded: (trades: Trade[]) => void;
@@ -42,6 +43,36 @@ export default function UploadTrades({ onTradesUploaded }: UploadTradesProps) {
       });
 
       onTradesUploaded(trades);
+
+      try {
+        // Try to upload the raw CSV to Supabase Storage and create a session record
+        const userRes = await supabase.auth.getUser();
+        const user = userRes.data?.user;
+
+        if (user) {
+          const path = `${user.id}/${Date.now()}-${file.name}`;
+          const { error: uploadError } = await supabase.storage.from('uploads').upload(path, file, { upsert: true });
+
+          if (uploadError) {
+            console.warn('Failed to upload CSV to storage:', uploadError.message);
+          } else {
+            // create session record
+            const { error: insertError } = await supabase.from('upload_sessions').insert([
+              {
+                name: file.name,
+                path: path,
+                metadata: { rows: trades.length },
+              },
+            ]);
+
+            if (insertError) {
+              console.warn('Failed to create upload session record:', insertError.message);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Session recording skipped:', err);
+      }
     } catch (error) {
       console.error('Error parsing file:', error);
       alert('Error parsing file. Please ensure it is a valid CSV with the correct format.');
