@@ -19,7 +19,7 @@ export default function Layout({ children, onNavigate, currentPage, userEmail, o
         backgroundAttachment: 'fixed',
       }}
     >
-      <header className="backdrop-blur-xl bg-white/25 border-b-2 border-white/50 sticky top-0 z-50 shadow-lg shadow-black/20">
+      <header className="backdrop-blur-xl bg-white/75 border-b-2 border-white/50 sticky top-0 z-50 shadow-lg shadow-black/20">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">

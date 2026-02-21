@@ -211,8 +211,8 @@ function App() {
       userEmail={session.user.email || ''}
     >
       {currentPage === 'dashboard' ? (
-        <div className="space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-8 flex flex-col items-center">
+          <div className="w-full max-w-2xl">
             <UploadTrades onTradesUploaded={handleTradesUploaded} />
           </div>
         </div>

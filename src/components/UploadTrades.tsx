@@ -20,7 +20,7 @@ export default function UploadTrades({ onTradesUploaded }: UploadTradesProps) {
       const lines = text.split('\n').filter(line => line.trim());
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
 
-      const trades: Trade[] = lines.slice(1).map((line, index) => {
+      const trades: Trade[] = lines.slice(1).map((line) => {
         const values = line.split(',').map(v => v.trim());
         const tradeData: Record<string, string> = {};
 
@@ -51,7 +51,7 @@ export default function UploadTrades({ onTradesUploaded }: UploadTradesProps) {
   };
 
   return (
-    <div className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">
+    <div className="bg-white/10 border-2 border-white/20 rounded-2xl p-6 shadow-lg">
       <h2 className="text-xl font-bold text-gray-900 mb-4">Upload Trading History</h2>
 
       <label className="block">
