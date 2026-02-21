@@ -14,6 +14,7 @@ function App() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [analysis, setAnalysis] = useState<BiasAnalysisResult | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [sessions, setSessions] = useState<any[]>([]);
   const [authLoading, setAuthLoading] = useState(true);
   const [authSubmitLoading, setAuthSubmitLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -78,6 +79,68 @@ function App() {
     }
   }, []);
 
+  const loadSessions = useCallback(async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('upload_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading sessions from supabase:', error);
+        return;
+      }
+
+      setSessions(data || []);
+    } catch (err) {
+      console.error('Error loading sessions:', err);
+    }
+  }, []);
+
+  const handleLoadSession = async (sess: any) => {
+    try {
+      if (!sess?.path) return;
+      const { data, error } = await supabase.storage.from('uploads').download(sess.path);
+      if (error) {
+        console.error('Error downloading session CSV:', error);
+        alert('Unable to download selected session.');
+        return;
+      }
+
+      const text = await new Response(data).text();
+      const lines = text.split('\n').filter((l) => l.trim());
+      const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
+
+      const tradesParsed = lines.slice(1).map((line, index) => {
+        const values = line.split(',').map((v) => v.trim());
+        const tradeData: Record<string, string> = {};
+        headers.forEach((header, i) => {
+          tradeData[header] = values[i] || '';
+        });
+
+        return {
+          id: `session-${sess.id}-${index}`,
+          timestamp: tradeData.timestamp || new Date().toISOString(),
+          asset: tradeData.asset || '',
+          side: (tradeData.side?.toLowerCase() === 'buy' ? 'buy' : 'sell') as 'buy' | 'sell',
+          quantity: parseFloat(tradeData.quantity || '0'),
+          entry_price: parseFloat(tradeData.entry_price || tradeData.entryprice || '0'),
+          exit_price: parseFloat(tradeData.exit_price || tradeData.exitprice || '0'),
+          profit_loss: parseFloat(tradeData.profit_loss || tradeData.profitloss || tradeData.p_l || tradeData.pl || '0'),
+          balance: parseFloat(tradeData.balance || '0'),
+        };
+      });
+
+      setTrades(tradesParsed);
+      setAnalysis(generateDummyAnalysis(tradesParsed));
+      setCurrentPage('analysis');
+    } catch (err) {
+      console.error('Error loading session:', err);
+      alert('Error loading session CSV.');
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
 
@@ -106,7 +169,8 @@ function App() {
     }
 
     loadRemoteTrades(session.user.id);
-  }, [session?.user?.id, loadLocalTrades, loadRemoteTrades]);
+    loadSessions(session.user.id);
+  }, [session?.user?.id, loadLocalTrades, loadRemoteTrades, loadSessions]);
 
   const handleSignIn = async (email: string, password: string) => {
     setAuthSubmitLoading(true);
@@ -220,7 +284,14 @@ function App() {
   }
 
   return (
-    <Layout currentPage={currentPage} onNavigate={setCurrentPage} onSignOut={handleSignOut} userEmail={session.user.email || ''}>
+    <Layout
+      currentPage={currentPage}
+      onNavigate={setCurrentPage}
+      onSignOut={handleSignOut}
+      userEmail={session.user.email || ''}
+      sessions={sessions}
+      onSelectSession={handleLoadSession}
+    >
       {currentPage === 'dashboard' ? (
         <div className="space-y-8 flex flex-col items-center">
           <div className="w-full max-w-2xl">
