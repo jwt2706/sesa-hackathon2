@@ -4,11 +4,12 @@ import { Trade } from '../types/trade';
 import supabase from '../lib/supabase';
 
 interface UploadTradesProps {
-  onTradesUploaded: (trades: Trade[]) => void;
+  onTradesUploaded: (trades: Trade[]) => void | Promise<void>;
 }
 
 export default function UploadTrades({ onTradesUploaded }: UploadTradesProps) {
   const [uploading, setUploading] = useState(false);
+  const enableSessionUpload = import.meta.env.VITE_ENABLE_UPLOAD_SESSIONS === 'true';
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,37 +43,38 @@ export default function UploadTrades({ onTradesUploaded }: UploadTradesProps) {
         };
       });
 
-      onTradesUploaded(trades);
+      if (enableSessionUpload) {
+        try {
+          const userRes = await supabase.auth.getUser();
+          const user = userRes.data?.user;
 
-      try {
-        // Try to upload the raw CSV to Supabase Storage and create a session record
-        const userRes = await supabase.auth.getUser();
-        const user = userRes.data?.user;
+          if (user) {
+            const path = `${user.id}/${Date.now()}-${file.name}`;
+            const { error: uploadError } = await supabase.storage.from('uploads').upload(path, file, { upsert: true });
 
-        if (user) {
-          const path = `${user.id}/${Date.now()}-${file.name}`;
-          const { error: uploadError } = await supabase.storage.from('uploads').upload(path, file, { upsert: true });
+            if (uploadError) {
+              console.warn('Session upload disabled by policy or bucket settings:', uploadError.message);
+            } else {
+              const { error: insertError } = await supabase.from('upload_sessions').insert([
+                {
+                  user_id: user.id,
+                  name: file.name,
+                  path,
+                  metadata: { rows: trades.length },
+                },
+              ]);
 
-          if (uploadError) {
-            console.warn('Failed to upload CSV to storage:', uploadError.message);
-          } else {
-            // create session record
-            const { error: insertError } = await supabase.from('upload_sessions').insert([
-              {
-                name: file.name,
-                path: path,
-                metadata: { rows: trades.length },
-              },
-            ]);
-
-            if (insertError) {
-              console.warn('Failed to create upload session record:', insertError.message);
+              if (insertError) {
+                console.warn('Upload session record skipped:', insertError.message);
+              }
             }
           }
+        } catch (err) {
+          console.warn('Session recording skipped:', err);
         }
-      } catch (err) {
-        console.warn('Session recording skipped:', err);
       }
+
+      await onTradesUploaded(trades);
     } catch (error) {
       console.error('Error parsing file:', error);
       alert('Error parsing file. Please ensure it is a valid CSV with the correct format.');

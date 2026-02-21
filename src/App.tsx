@@ -207,10 +207,10 @@ function App() {
     try {
       await appendTradesLocal(newTrades);
       await loadLocalTrades();
-      setCurrentPage('analysis');
     } catch (e) {
       console.error('Error saving trades locally:', e);
       alert('Error saving trades locally. Please try again.');
+      return;
     }
 
     if (session?.user?.id) {
@@ -253,20 +253,8 @@ function App() {
 
       await loadRemoteTrades(session.user.id);
     }
-  };
 
-  const handleTradeAdded = async (trade: Trade) => {
-    try {
-      await appendTradesLocal([trade]);
-      await loadLocalTrades();
-    } catch (e) {
-      console.error('Error adding trade locally:', e);
-      alert('Error adding trade locally.');
-    }
-
-    if (session?.user?.id) {
-      await loadRemoteTrades(session.user.id);
-    }
+    setCurrentPage('analysis');
   };
 
   if (authLoading) {
