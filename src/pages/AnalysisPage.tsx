@@ -2,6 +2,7 @@ import TradeHeatmap from '../trade_analysis/tradeHeatmap';
 import PLCard from '../components/analysis/PLCard';
 import PLByMonthHeatmap from '../components/analysis/PLByMonthHeatmap';
 import DayOfMonthSummary from '../components/analysis/DayOfMonthSummary';
+import PersonalAnalysis from '../components/analysis/PersonalAnalysis';
 import { Trade, BiasAnalysisResult } from '../types/trade';
 
 function SentimentGraphCard({ trades }: { trades: Trade[] }) {
@@ -53,14 +54,7 @@ export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
 
       <div className="space-y-6">
         <DayOfMonthSummary trades={trades} />
-        <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Personal Analysis & Recommendation</h3>
-          <p className="text-gray-700 font-medium">
-            {analysis
-              ? `Detected focus area: ${analysis.overtrading.severity.toUpperCase()} overtrading risk, ${analysis.lossAversion.severity.toUpperCase()} loss aversion risk, and ${analysis.revengeTrading.severity.toUpperCase()} revenge-trading risk.`
-              : 'Add your personal notes and recommendations here.'}
-          </p>
-        </div>
+        <PersonalAnalysis trades={trades} />
       </div>
     </div>
   );
