@@ -26,53 +26,53 @@ export default function TradesTable({ trades }: TradesTableProps) {
 
   if (trades.length === 0) {
     return (
-      <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-12 shadow-xl text-center">
-        <p className="text-white/60 text-lg">No trades to display</p>
-        <p className="text-white/40 text-sm mt-2">Upload a CSV or add trades manually to get started</p>
+      <div className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl p-12 shadow-xl text-center">
+        <p className="text-gray-900 text-lg font-semibold">No trades to display</p>
+        <p className="text-gray-600 text-sm mt-2 font-medium">Upload a CSV or add trades manually to get started</p>
       </div>
     );
   }
 
   return (
-    <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-xl overflow-hidden">
-      <div className="p-6 border-b border-white/20">
-        <h2 className="text-xl font-bold text-white">Trading History</h2>
-        <p className="text-sm text-white/60 mt-1">{trades.length} trades recorded</p>
+    <div className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl shadow-xl overflow-hidden">
+      <div className="p-6 border-b-2 border-gray-300">
+        <h2 className="text-xl font-bold text-gray-900">Trading History</h2>
+        <p className="text-sm text-gray-700 mt-1 font-medium">{trades.length} trades recorded</p>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-white/5">
+          <thead className="bg-white/25 border-b-2 border-gray-300">
             <tr>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-white/80 uppercase tracking-wider">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-white/90 uppercase tracking-wider">
                 Timestamp
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-white/80 uppercase tracking-wider">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-white/90 uppercase tracking-wider">
                 Asset
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-white/80 uppercase tracking-wider">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-white/90 uppercase tracking-wider">
                 Side
               </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-white/80 uppercase tracking-wider">
+              <th className="px-6 py-4 text-right text-xs font-semibold text-white/90 uppercase tracking-wider">
                 Quantity
               </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-white/80 uppercase tracking-wider">
+              <th className="px-6 py-4 text-right text-xs font-semibold text-white/90 uppercase tracking-wider">
                 Entry Price
               </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-white/80 uppercase tracking-wider">
+              <th className="px-6 py-4 text-right text-xs font-semibold text-white/90 uppercase tracking-wider">
                 Exit Price
               </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-white/80 uppercase tracking-wider">
+              <th className="px-6 py-4 text-right text-xs font-semibold text-white/90 uppercase tracking-wider">
                 P/L
               </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-white/80 uppercase tracking-wider">
+              <th className="px-6 py-4 text-right text-xs font-semibold text-white/90 uppercase tracking-wider">
                 Balance
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/10">
-            {trades.map((trade) => (
-              <tr key={trade.id} className="hover:bg-white/5 transition-colors">
+          <tbody className="divide-y divide-white/20">
+            {trades.map((trade, index) => (
+              <tr key={index} className="hover:bg-white/15 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-white/80">
                   {formatDate(trade.timestamp)}
                 </td>

@@ -8,9 +8,9 @@ interface AnalysisDashboardProps {
 export default function AnalysisDashboard({ analysis }: AnalysisDashboardProps) {
   if (!analysis) {
     return (
-      <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-12 shadow-xl text-center">
-        <p className="text-white/60 text-lg">No analysis available</p>
-        <p className="text-white/40 text-sm mt-2">Add trades to see your bias analysis</p>
+      <div className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl p-12 shadow-xl text-center">
+        <p className="text-gray-900 text-lg font-semibold">No analysis available</p>
+        <p className="text-gray-600 text-sm mt-2">Add trades to see your bias analysis</p>
       </div>
     );
   }
@@ -31,13 +31,13 @@ export default function AnalysisDashboard({ analysis }: AnalysisDashboardProps) 
   const getSeverityBorder = (severity: string) => {
     switch (severity) {
       case 'high':
-        return 'border-red-500/30';
+        return 'border-red-500/50';
       case 'medium':
-        return 'border-yellow-500/30';
+        return 'border-yellow-500/50';
       case 'low':
-        return 'border-green-500/30';
+        return 'border-green-500/50';
       default:
-        return 'border-gray-500/30';
+        return 'border-gray-500/50';
     }
   };
 
@@ -64,10 +64,9 @@ export default function AnalysisDashboard({ analysis }: AnalysisDashboardProps) 
 
   return (
     <div className="space-y-6">
-      <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-6 shadow-xl">
-        <h2 className="text-2xl font-bold text-white mb-2">Bias Analysis</h2>
-        <p className="text-white/60">Behavioral patterns detected in your trading history</p>
-      </div>
+      <div className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Bias Analysis</h2>
+        <p className="text-gray-700 font-medium">Behavioral patterns detected in your trading history</p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {biases.map((bias) => {
@@ -75,9 +74,13 @@ export default function AnalysisDashboard({ analysis }: AnalysisDashboardProps) 
           return (
             <div
               key={bias.name}
-              className={`backdrop-blur-md bg-white/10 border ${getSeverityBorder(
-                bias.data.severity
-              )} rounded-2xl p-6 shadow-xl`}
+              className={`backdrop-blur-xl bg-white/30 border-2 rounded-2xl p-6 shadow-lg ${
+                bias.data.severity === 'high'
+                  ? 'border-red-500'
+                  : bias.data.severity === 'medium'
+                  ? 'border-yellow-500'
+                  : 'border-green-500'
+              }`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div
@@ -88,23 +91,23 @@ export default function AnalysisDashboard({ analysis }: AnalysisDashboardProps) 
                   <Icon className="w-6 h-6 text-white" />
                 </div>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold uppercase ${
+                  className={`px-3 py-1 rounded-full text-xs font-semibold uppercase backdrop-blur-md ${
                     bias.data.severity === 'high'
-                      ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                      ? 'bg-red-500/30 text-red-100 border border-red-500/50'
                       : bias.data.severity === 'medium'
-                      ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                      : 'bg-green-500/20 text-green-300 border border-green-500/30'
+                      ? 'bg-yellow-500/30 text-yellow-100 border border-yellow-500/50'
+                      : 'bg-green-500/30 text-green-100 border border-green-500/50'
                   }`}
                 >
                   {bias.data.severity}
                 </span>
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-2">{bias.name}</h3>
-              <p className="text-sm text-white/60 mb-4">{bias.description}</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{bias.name}</h3>
+              <p className="text-sm text-gray-700 mb-4 font-medium">{bias.description}</p>
 
-              <div className="mt-4 p-4 bg-white/5 rounded-lg border border-white/10">
-                <p className="text-sm text-white/80">{bias.data.message}</p>
+              <div className="mt-4 p-4 bg-white/25 rounded-lg border-2 border-gray-300 shadow-sm">
+                <p className="text-sm text-gray-800 font-medium">{bias.data.message}</p>
               </div>
 
               {bias.data.detected && (
@@ -120,40 +123,40 @@ export default function AnalysisDashboard({ analysis }: AnalysisDashboardProps) 
         })}
       </div>
 
-      <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-6 shadow-xl">
-        <h3 className="text-lg font-bold text-white mb-4">Recommendations</h3>
+      <div className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Recommendations</h3>
         <div className="space-y-3">
-          <div className="flex items-start space-x-3 p-4 bg-white/5 rounded-lg border border-white/10">
-            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="flex items-start space-x-3 p-4 bg-white/25 rounded-lg border-2 border-red-300 shadow-sm">
+            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 border-2 border-red-700">
               <span className="text-white text-xs font-bold">1</span>
             </div>
             <div>
-              <p className="text-white font-medium">Set daily trade limits</p>
-              <p className="text-sm text-white/60 mt-1">
+              <p className="text-gray-900 font-bold">Set daily trade limits</p>
+              <p className="text-sm text-gray-700 mt-1 font-medium">
                 Limit yourself to a maximum number of trades per day to avoid overtrading
               </p>
             </div>
           </div>
 
-          <div className="flex items-start space-x-3 p-4 bg-white/5 rounded-lg border border-white/10">
-            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="flex items-start space-x-3 p-4 bg-white/25 rounded-lg border-2 border-red-300 shadow-sm">
+            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 border-2 border-red-700">
               <span className="text-white text-xs font-bold">2</span>
             </div>
             <div>
-              <p className="text-white font-medium">Implement stop-loss discipline</p>
-              <p className="text-sm text-white/60 mt-1">
+              <p className="text-gray-900 font-bold">Implement stop-loss discipline</p>
+              <p className="text-sm text-gray-700 mt-1 font-medium">
                 Always use stop-loss orders and stick to them to prevent loss aversion
               </p>
             </div>
           </div>
 
-          <div className="flex items-start space-x-3 p-4 bg-white/5 rounded-lg border border-white/10">
-            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="flex items-start space-x-3 p-4 bg-white/25 rounded-lg border-2 border-red-300 shadow-sm">
+            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 border-2 border-red-700">
               <span className="text-white text-xs font-bold">3</span>
             </div>
             <div>
-              <p className="text-white font-medium">Take cooling-off periods after losses</p>
-              <p className="text-sm text-white/60 mt-1">
+              <p className="text-gray-900 font-bold">Take cooling-off periods after losses</p>
+              <p className="text-sm text-gray-700 mt-1 font-medium">
                 Wait at least 15 minutes after a loss before placing another trade
               </p>
             </div>

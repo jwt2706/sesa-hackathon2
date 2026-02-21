@@ -23,7 +23,6 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
     e.preventDefault();
 
     const trade: Trade = {
-      id: `manual-${Date.now()}`,
       timestamp: new Date(formData.timestamp).toISOString(),
       asset: formData.asset,
       side: formData.side,
@@ -52,39 +51,39 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-6 shadow-xl hover:bg-white/15 transition-all group w-full"
+        className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl p-6 shadow-xl hover:bg-white/35 transition-all group w-full"
       >
         <div className="flex items-center justify-center space-x-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-red-500/30">
+          <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-red-500/40 border-2 border-red-700">
             <FaPlus className="w-6 h-6 text-white" />
           </div>
-          <span className="text-white font-semibold text-lg">Add Trade Manually</span>
+          <span className="text-gray-900 font-bold text-lg">Add Trade Manually</span>
         </div>
       </button>
     );
   }
 
   return (
-    <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-6 shadow-xl">
-      <h2 className="text-xl font-bold text-white mb-4">Add Trade Manually</h2>
+    <div className="backdrop-blur-xl bg-white/30 border-2 border-gray-300 rounded-2xl p-6 shadow-xl">
+      <h2 className="text-xl font-bold text-gray-900 mb-4">Add Trade Manually</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-bold text-gray-900 mb-2">
               Timestamp
             </label>
             <input
               type="datetime-local"
               value={formData.timestamp}
               onChange={(e) => setFormData({ ...formData, timestamp: e.target.value })}
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 backdrop-blur-sm"
+              className="w-full px-4 py-2 bg-white/30 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-bold text-gray-900 mb-2">
               Asset
             </label>
             <input
@@ -92,19 +91,19 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
               value={formData.asset}
               onChange={(e) => setFormData({ ...formData, asset: e.target.value })}
               placeholder="e.g., AAPL"
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 backdrop-blur-sm"
+              className="w-full px-4 py-2 bg-white/30 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-bold text-gray-900 mb-2">
               Side
             </label>
             <select
               value={formData.side}
               onChange={(e) => setFormData({ ...formData, side: e.target.value as 'buy' | 'sell' })}
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 backdrop-blur-sm"
+              className="w-full px-4 py-2 bg-white/30 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm font-medium"
               required
             >
               <option value="buy">Buy</option>
@@ -113,7 +112,7 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-bold text-gray-900 mb-2">
               Quantity
             </label>
             <input
@@ -122,13 +121,13 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
               value={formData.quantity}
               onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
               placeholder="0.00"
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 backdrop-blur-sm"
+              className="w-full px-4 py-2 bg-white/30 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-bold text-gray-900 mb-2">
               Entry Price
             </label>
             <input
@@ -137,13 +136,13 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
               value={formData.entry_price}
               onChange={(e) => setFormData({ ...formData, entry_price: e.target.value })}
               placeholder="0.00"
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 backdrop-blur-sm"
+              className="w-full px-4 py-2 bg-white/30 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-bold text-gray-900 mb-2">
               Exit Price
             </label>
             <input
@@ -152,13 +151,13 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
               value={formData.exit_price}
               onChange={(e) => setFormData({ ...formData, exit_price: e.target.value })}
               placeholder="0.00"
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 backdrop-blur-sm"
+              className="w-full px-4 py-2 bg-white/30 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-bold text-gray-900 mb-2">
               Profit/Loss
             </label>
             <input
@@ -167,13 +166,13 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
               value={formData.profit_loss}
               onChange={(e) => setFormData({ ...formData, profit_loss: e.target.value })}
               placeholder="0.00"
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 backdrop-blur-sm"
+              className="w-full px-4 py-2 bg-white/30 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-bold text-gray-900 mb-2">
               Balance
             </label>
             <input
@@ -182,7 +181,7 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
               value={formData.balance}
               onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
               placeholder="0.00"
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 backdrop-blur-sm"
+              className="w-full px-4 py-2 bg-white/30 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm font-medium"
               required
             />
           </div>
@@ -191,14 +190,14 @@ export default function ManualTradeEntry({ onTradeAdded }: ManualTradeEntryProps
         <div className="flex space-x-4 pt-2">
           <button
             type="submit"
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition-all shadow-lg shadow-red-500/30"
+            className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-bold border-2 border-red-700 hover:from-red-600 hover:to-red-700 transition-all shadow-lg hover:shadow-xl"
           >
             Add Trade
           </button>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="px-6 py-3 bg-white/10 text-white rounded-lg font-medium hover:bg-white/20 transition-all backdrop-blur-sm border border-white/20"
+            className="px-6 py-3 bg-white/30 text-gray-900 rounded-lg font-bold border-2 border-gray-300 hover:bg-white/40 transition-all shadow-md hover:shadow-lg"
           >
             Cancel
           </button>
