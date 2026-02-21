@@ -6,6 +6,7 @@ export default function FAQPage() {
     overtrading: false,
     lossAversion: false,
     revengeTrading: false,
+    personalized: false,
   });
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -152,6 +153,47 @@ export default function FAQPage() {
                     By identifying revenge trading patterns, the tool can help users become aware of these risky tendencies, allowing them to make more rational and informed trading decisions.
                   </p>
                 </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Personalized Suggestions Section */}
+        <div className="border-t-2 border-gray-300">
+          <button
+            onClick={() => toggleSection('personalized')}
+            className="w-full p-8 text-left hover:bg-white/10 transition-colors flex items-center justify-between"
+          >
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">4. Recommendations</h2>
+              <p className="text-gray-700 font-semibold mt-2">Actionable, personalized tips to improve your trading</p>
+            </div>
+            <FaChevronDown
+              className={`text-gray-900 transition-transform ${expandedSections.personalized ? 'rotate-180' : ''}`}
+            />
+          </button>
+
+          {expandedSections.personalized && (
+            <div className="border-t-2 border-gray-300 px-8 py-6">
+              <div className="space-y-4">
+                <p className="text-gray-800 leading-relaxed font-medium">
+                  These suggestions are designed to be practical and easy to apply. Consider adopting one or two at a time and tracking their impact.
+                </p>
+
+                <ul className="list-disc list-inside space-y-2 text-gray-800 font-medium">
+                  <li>
+                    <strong>Daily trade limits:</strong> Set a maximum number of trades per day to prevent overtrading and reduce impulsive decisions.
+                  </li>
+                  <li>
+                    <strong>Setting stop-loss discipline:</strong> Define stop-loss rules before entering trades to manage risk and avoid holding large, uncontrolled losses.
+                  </li>
+                  <li>
+                    <strong>Cooling-off periods:</strong> After a string of losses or emotionally charged trades, take a scheduled break to regain objectivity.
+                  </li>
+                  <li>
+                    <strong>Journaling prompts for trading psychology:</strong> Record short notes after each trade (e.g., motive, emotion, takeaway) to identify behavioral patterns over time.
+                  </li>
+                </ul>
               </div>
             </div>
           )}
