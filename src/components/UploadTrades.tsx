@@ -78,7 +78,7 @@ export default function UploadTrades({ onTradesUploaded, sessions = [], onOpenSe
 
     try {
       const text = await file.text();
-      const lines = text.split('\n').filter((line) => line.trim());
+      const lines = text.split(/\r?\n/).filter((line) => line.trim());
       if (lines.length < 2) {
         alert('CSV appears empty. Please upload a file with headers and at least one trade row.');
         return;
@@ -118,9 +118,11 @@ export default function UploadTrades({ onTradesUploaded, sessions = [], onOpenSe
           timestamp,
           asset,
           side,
-          quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
-          entry_price: Number.isFinite(entryPrice) && entryPrice > 0 ? entryPrice : 0.0001,
-          exit_price: Number.isFinite(exitPrice) && exitPrice > 0 ? exitPrice : 0.0001,
+          // don't mask missing quantity with 1 — prefer 0 so analysis can detect invalid rows
+          quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 0,
+          // default to 0 when prices are missing so profit calculations don't assume tiny defaults
+          entry_price: Number.isFinite(entryPrice) && entryPrice > 0 ? entryPrice : 0,
+          exit_price: Number.isFinite(exitPrice) && exitPrice > 0 ? exitPrice : 0,
           profit_loss: Number.isFinite(profitLoss) ? profitLoss : 0,
           balance,
         };

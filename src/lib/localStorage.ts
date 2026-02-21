@@ -1,7 +1,9 @@
 import { Trade } from '../types/trade';
 
 const STORAGE_KEY = 'sesa_trades_v1';
-const MAX_LOCAL_TRADES = 2000;
+// Allow storing larger uploads locally. Keep reasonably large cap to avoid
+// unbounded localStorage growth; fallback logic will trim if quota exceeded.
+const MAX_LOCAL_TRADES = 100000;
 
 export const loadTradesLocal = async (): Promise<Trade[]> => {
   try {
@@ -16,26 +18,37 @@ export const loadTradesLocal = async (): Promise<Trade[]> => {
 };
 
 export const saveTradesLocal = async (trades: Trade[]) => {
+  // Try to persist as many trades as possible up to MAX_LOCAL_TRADES.
   const normalized = trades.slice(0, MAX_LOCAL_TRADES);
+
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+    return;
   } catch (e) {
-    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-      try {
-        const compact = normalized.slice(0, Math.max(250, Math.floor(MAX_LOCAL_TRADES / 2)));
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(compact));
-        return;
-      } catch (retryError) {
-        console.error('Error saving compacted local trades:', retryError);
-      }
-    }
-    console.error('Error saving local trades:', e);
+    console.warn('localStorage quota exceeded when saving trades, attempting to compact...', e);
   }
+
+  // If quota exceeded, try progressively smaller sizes to ensure some data is saved.
+  const fallbackSizes = [Math.max(5000, Math.floor(MAX_LOCAL_TRADES / 10)), 2000, 1000, 500, 250, 100];
+  for (const size of fallbackSizes) {
+    try {
+      const compact = normalized.slice(0, size);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(compact));
+      console.warn(`Saved compacted trades (${compact.length} rows) to localStorage.`);
+      return;
+    } catch (err) {
+      // keep trying smaller sizes
+    }
+  }
+
+  console.error('Failed to save trades to localStorage after multiple compaction attempts.');
 };
 
 export const appendTradesLocal = async (newTrades: Trade[]) => {
   const existing = await loadTradesLocal();
-  const merged = [...newTrades, ...existing].slice(0, MAX_LOCAL_TRADES);
+  // Keep newest trades first (as UI expects recent first in many places)
+  const merged = [...newTrades, ...existing];
   await saveTradesLocal(merged);
+  // Return the in-memory merged array (not truncated) so caller can use full set immediately
   return merged;
 };
