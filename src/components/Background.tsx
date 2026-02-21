@@ -16,9 +16,9 @@ export interface FlickeringGridProps {
 }
 
 export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
-  squareSize = 20,
+  squareSize = 10,
   gridGap = 8,
-  flickerChance = 0.05,
+  flickerChance = 0.1,
   color = "rgb(222, 22, 29)",
   width,
   height,

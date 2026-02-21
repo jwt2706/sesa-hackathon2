@@ -323,7 +323,7 @@ function App() {
     >
       {currentPage === 'dashboard' ? (
         <div className="space-y-8">
-          <div className="w-full max-w-3xl">
+          <div className="w-full max-w-3xl mx-auto">
             <UploadTrades
               onTradesUploaded={handleTradesUploaded}
               sessions={sessions}
@@ -334,7 +334,7 @@ function App() {
         </div>
       ) : currentPage === 'analysis' ? (
         <div className="space-y-8">
-          <div className="w-full max-w-3xl">
+          <div className="w-full max-w-3xl mx-auto">
             <UploadTrades
               onTradesUploaded={handleTradesUploaded}
               sessions={sessions}
