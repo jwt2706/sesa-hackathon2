@@ -5,9 +5,9 @@ import supabase from '../lib/supabase';
 
 interface UploadTradesProps {
   onTradesUploaded: (trades: Trade[]) => void | Promise<void>;
-  sessions?: Array<{ id: string; name?: string; created_at?: string }>;
-  onOpenSession?: (session: { id: string; name?: string; created_at?: string }) => void;
-  onDeleteSession?: (session: { id: string; name?: string; created_at?: string }) => void;
+  sessions?: Array<{ id: string; name?: string; created_at?: string; path?: string }>;
+  onOpenSession?: (session: { id: string; name?: string; created_at?: string; path?: string }) => void | Promise<void>;
+  onDeleteSession?: (session: { id: string; name?: string; created_at?: string; path?: string }) => void | Promise<void>;
 }
 
 const HEADER_ALIASES: Record<string, string[]> = {
@@ -68,7 +68,18 @@ function normalizeSide(raw: string): 'buy' | 'sell' {
 export default function UploadTrades({ onTradesUploaded, sessions = [], onOpenSession, onDeleteSession }: UploadTradesProps) {
   const [uploading, setUploading] = useState(false);
   const [pastUploadsOpen, setPastUploadsOpen] = useState(false);
+  const [openingSessionId, setOpeningSessionId] = useState<string | null>(null);
   const enableSessionUpload = import.meta.env.VITE_ENABLE_UPLOAD_SESSIONS !== 'false';
+
+  const handleOpenSession = async (sess: { id: string; name?: string; created_at?: string; path?: string }) => {
+    if (!onOpenSession || openingSessionId) return;
+    setOpeningSessionId(sess.id);
+    try {
+      await onOpenSession(sess);
+    } finally {
+      setOpeningSessionId(null);
+    }
+  };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -219,13 +230,15 @@ export default function UploadTrades({ onTradesUploaded, sessions = [], onOpenSe
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => onOpenSession?.(sess)}
+                        onClick={() => handleOpenSession(sess)}
+                        disabled={openingSessionId !== null}
                         className="px-2.5 py-1 rounded-lg border-2 border-red-500 text-red-700 text-xs font-bold hover:bg-red-50 transition-all"
                       >
-                        Open
+                        {openingSessionId === sess.id ? 'Opening...' : 'Open'}
                       </button>
                       <button
                         onClick={() => onDeleteSession?.(sess)}
+                        disabled={openingSessionId !== null}
                         className="px-2.5 py-1 rounded-lg border-2 border-gray-300 text-gray-900 text-xs font-bold hover:bg-white/50 transition-all"
                       >
                         Delete

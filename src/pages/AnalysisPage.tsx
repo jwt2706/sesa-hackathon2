@@ -130,6 +130,36 @@ interface AnalysisPageProps {
 }
 
 export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
+  const sortedTrades = [...trades]
+    .filter((trade) => trade.timestamp)
+    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+  const balanceDrops = sortedTrades
+    .map((trade, index) => {
+      if (index === 0) return 0;
+      const prevBalance = Number(sortedTrades[index - 1].balance);
+      const currentBalance = Number(trade.balance);
+      if (!Number.isFinite(prevBalance) || !Number.isFinite(currentBalance)) return 0;
+      return Math.max(0, prevBalance - currentBalance);
+    })
+    .filter((drop) => drop > 0);
+
+  const avgBalanceDrop =
+    balanceDrops.length > 0 ? balanceDrops.reduce((sum, drop) => sum + drop, 0) / balanceDrops.length : 0;
+  const suddenDropThreshold = Math.max(150, avgBalanceDrop * 2);
+
+  const suddenLossHits = sortedTrades.reduce((count, trade, index) => {
+    if (index === 0) return count;
+    const prevBalance = Number(sortedTrades[index - 1].balance);
+    const currentBalance = Number(trade.balance);
+    const profitLoss = Number(trade.profit_loss);
+    if (!Number.isFinite(prevBalance) || !Number.isFinite(currentBalance) || !Number.isFinite(profitLoss)) return count;
+    const drop = prevBalance - currentBalance;
+    return drop >= suddenDropThreshold && profitLoss < 0 ? count + 1 : count;
+  }, 0);
+
+  const lossAversionFromDrops = suddenLossHits >= 2;
+
   const severityWeight = (severity?: string) => {
     if (severity === 'high') return 3;
     if (severity === 'medium') return 2;
@@ -146,7 +176,10 @@ export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
         {
           key: 'lossAversion' as const,
           label: 'loss aversion',
-          score: (analysis.lossAversion.detected ? 2 : 0) + severityWeight(analysis.lossAversion.severity),
+          score:
+            (analysis.lossAversion.detected ? 2 : 0) +
+            severityWeight(analysis.lossAversion.severity) +
+            (lossAversionFromDrops ? 4 : 0),
         },
         {
           key: 'revengeTrading' as const,
@@ -186,7 +219,7 @@ export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
     : recommendationsByBias.default;
 
   const hasDetectedBias = analysis
-    ? analysis.overtrading.detected || analysis.lossAversion.detected || analysis.revengeTrading.detected
+    ? analysis.overtrading.detected || analysis.lossAversion.detected || analysis.revengeTrading.detected || lossAversionFromDrops
     : false;
 
   return (
@@ -209,7 +242,9 @@ export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
               {hasDetectedBias && dominantBias?.key === 'overtrading'
                 ? analysis.overtrading.message
                 : hasDetectedBias && dominantBias?.key === 'lossAversion'
-                ? analysis.lossAversion.message
+                ? lossAversionFromDrops
+                  ? `Detected sudden large loss drops in your trade history (${suddenLossHits} events over ~${suddenDropThreshold.toFixed(0)} balance points), which is a strong loss-aversion signal.`
+                  : analysis.lossAversion.message
                 : hasDetectedBias && dominantBias?.key === 'revengeTrading'
                 ? analysis.revengeTrading.message
                 : 'No strong bias detected from current data. Keep following your plan and risk rules.'}
