@@ -9,12 +9,20 @@ import { Trade, BiasAnalysisResult } from './types/trade';
 import supabase from './lib/supabase';
 import type { Session } from '@supabase/supabase-js';
 
+interface UploadSession {
+  id: string;
+  user_id?: string;
+  name?: string;
+  path?: string;
+  created_at?: string;
+}
+
 function App() {
   const [currentPage, setCurrentPage] = useState<'dashboard' | 'faq' | 'analysis'>('dashboard');
   const [trades, setTrades] = useState<Trade[]>([]);
   const [analysis, setAnalysis] = useState<BiasAnalysisResult | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [sessions, setSessions] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<UploadSession[]>([]);
   const [authLoading, setAuthLoading] = useState(true);
   const [authSubmitLoading, setAuthSubmitLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -98,7 +106,7 @@ function App() {
     }
   }, []);
 
-  const handleLoadSession = async (sess: any) => {
+  const handleLoadSession = async (sess: UploadSession) => {
     try {
       if (!sess?.path) return;
       const { data, error } = await supabase.storage.from('uploads').download(sess.path);
@@ -138,6 +146,31 @@ function App() {
     } catch (err) {
       console.error('Error loading session:', err);
       alert('Error loading session CSV.');
+    }
+  };
+
+  const handleDeleteSession = async (sess: UploadSession) => {
+    if (!session?.user?.id || !sess?.id) return;
+
+    try {
+      if (sess.path) {
+        const { error: removeError } = await supabase.storage.from('uploads').remove([sess.path]);
+        if (removeError) {
+          console.warn('Could not remove storage object:', removeError.message);
+        }
+      }
+
+      const { error } = await supabase.from('upload_sessions').delete().eq('id', sess.id).eq('user_id', session.user.id);
+      if (error) {
+        console.error('Error deleting upload session:', error);
+        alert('Could not delete upload session.');
+        return;
+      }
+
+      await loadSessions(session.user.id);
+    } catch (err) {
+      console.error('Error deleting upload session:', err);
+      alert('Could not delete upload session.');
     }
   };
 
@@ -218,13 +251,13 @@ function App() {
         // Prepare rows for insertion to Supabase (exclude local-only `id`)
         const rows = newTrades.map((t) => ({
           timestamp: t.timestamp,
-          asset: t.asset,
-          side: t.side,
-          quantity: t.quantity,
-          entry_price: t.entry_price,
-          exit_price: t.exit_price,
-          profit_loss: t.profit_loss,
-          balance: t.balance,
+          asset: (t.asset || '').trim(),
+          side: t.side === 'buy' || t.side === 'sell' ? t.side : 'sell',
+          quantity: Number(t.quantity),
+          entry_price: Number(t.entry_price),
+          exit_price: Number(t.exit_price),
+          profit_loss: Number(t.profit_loss),
+          balance: Math.max(0, Number(t.balance)),
         }));
 
         // Filter out invalid rows that would violate DB constraints
@@ -236,22 +269,32 @@ function App() {
             Number.isFinite(r.quantity) &&
             Number.isFinite(r.entry_price) &&
             Number.isFinite(r.exit_price) &&
+            Number.isFinite(r.profit_loss) &&
+            Number.isFinite(r.balance) &&
             r.quantity > 0 &&
             r.entry_price > 0 &&
-            r.exit_price > 0
+            r.exit_price > 0 &&
+            r.balance >= 0
         );
+
+        if (validRows.length < rows.length) {
+          console.warn(`Skipped ${rows.length - validRows.length} invalid row(s) before Supabase insert.`);
+        }
 
         if (validRows.length > 0) {
           const { error } = await supabase.from('trades').insert(validRows);
           if (error) {
             console.error('Error inserting trades to supabase:', error);
           }
+        } else {
+          console.warn('No valid rows available for Supabase insert after normalization.');
         }
       } catch (err) {
         console.error('Error uploading trades to supabase:', err);
       }
 
       await loadRemoteTrades(session.user.id);
+      await loadSessions(session.user.id);
     }
 
     setCurrentPage('analysis');
@@ -273,21 +316,33 @@ function App() {
 
   return (
     <Layout
-      currentPage={currentPage}
       onNavigate={setCurrentPage}
       onSignOut={handleSignOut}
       userEmail={session.user.email || ''}
-      sessions={sessions}
-      onSelectSession={handleLoadSession}
     >
       {currentPage === 'dashboard' ? (
-        <div className="space-y-8 flex flex-col items-center">
-          <div className="w-full max-w-2xl">
-            <UploadTrades onTradesUploaded={handleTradesUploaded} />
+        <div className="space-y-8">
+          <div className="w-full max-w-3xl">
+            <UploadTrades
+              onTradesUploaded={handleTradesUploaded}
+              sessions={sessions}
+              onOpenSession={handleLoadSession}
+              onDeleteSession={handleDeleteSession}
+            />
           </div>
         </div>
       ) : currentPage === 'analysis' ? (
-        <AnalysisPage trades={trades} analysis={analysis} />
+        <div className="space-y-8">
+          <div className="w-full max-w-3xl">
+            <UploadTrades
+              onTradesUploaded={handleTradesUploaded}
+              sessions={sessions}
+              onOpenSession={handleLoadSession}
+              onDeleteSession={handleDeleteSession}
+            />
+          </div>
+          <AnalysisPage trades={trades} analysis={analysis} />
+        </div>
       ) : (
         <FAQPage />
       )}
