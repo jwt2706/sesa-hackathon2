@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Layout from './components/Layout';
 import UploadTrades from './components/UploadTrades';
 import ManualTradeEntry from './components/ManualTradeEntry';
@@ -6,11 +6,10 @@ import TradesTable from './components/TradesTable';
 import AnalysisDashboard from './components/AnalysisDashboard';
 import FAQPage from './components/FAQPage';
 import AnalysisPage from './pages/AnalysisPage';
-import { Trade, BiasAnalysisResult } from './types/trade';
-import { loadTradesLocal, appendTradesLocal, saveTradesLocal } from './lib/localStorage';
+import { loadTradesLocal, appendTradesLocal } from './lib/localStorage';
 import AuthForm from './components/AuthForm';
 import { Trade, BiasAnalysisResult } from './types/trade';
-import { supabase } from './lib/supabase';
+import supabase from './lib/supabase';
 import type { Session } from '@supabase/supabase-js';
 
 function App() {
@@ -58,60 +57,59 @@ function App() {
     };
   };
 
-  const loadTrades = async () => {
+  const loadLocalTrades = useCallback(async () => {
     const data = await loadTradesLocal();
     setTrades(data);
     setAnalysis(generateDummyAnalysis(data));
-  const loadTrades = async (userId: string) => {
-    const { data, error } = await supabase
+  }, []);
+
+  const loadRemoteTrades = useCallback(async (userId: string) => {
+    const { data: remoteData, error } = await supabase
       .from('trades')
       .select('*')
       .eq('user_id', userId)
       .order('timestamp', { ascending: false });
 
     if (error) {
-      console.error('Error loading trades:', error);
+      console.error('Error loading trades from supabase:', error);
       return;
     }
 
-    if (data) {
-      setTrades(data);
-      setAnalysis(generateDummyAnalysis(data));
+    if (remoteData) {
+      setTrades(remoteData as Trade[]);
+      setAnalysis(generateDummyAnalysis(remoteData as Trade[]));
     }
-  };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+    supabase.auth.getSession().then((res: { data: { session: Session | null } }) => {
       if (!mounted) return;
-      setSession(currentSession);
+      setSession(res.data.session ?? null);
       setAuthLoading(false);
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      setSession(currentSession);
+    const { data } = supabase.auth.onAuthStateChange((_event: string, currentSession: Session | null) => {
+      setSession(currentSession ?? null);
       setAuthLoading(false);
       setAuthError(null);
     });
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      data.subscription.unsubscribe();
     };
   }, []);
 
   useEffect(() => {
     if (!session?.user?.id) {
-      setTrades([]);
-      setAnalysis(null);
+      loadLocalTrades();
       return;
     }
 
-    loadTrades(session.user.id);
-  }, [session?.user?.id]);
+    loadRemoteTrades(session.user.id);
+  }, [session?.user?.id, loadLocalTrades, loadRemoteTrades]);
 
   const handleSignIn = async (email: string, password: string) => {
     setAuthSubmitLoading(true);
@@ -121,9 +119,7 @@ function App() {
 
     setAuthSubmitLoading(false);
 
-    if (error) {
-      setAuthError(error.message);
-    }
+    if (error) setAuthError(error.message);
   };
 
   const handleSignUp = async (email: string, password: string) => {
@@ -148,9 +144,8 @@ function App() {
 
   const handleTradesUploaded = async (newTrades: Trade[]) => {
     try {
-      // append to local storage and reload
       await appendTradesLocal(newTrades);
-      await loadTrades();
+      await loadLocalTrades();
       setCurrentPage('analysis');
     } catch (e) {
       console.error('Error saving trades locally:', e);
@@ -158,21 +153,58 @@ function App() {
     }
 
     if (session?.user?.id) {
-      await loadTrades(session.user.id);
+      try {
+        // Prepare rows for insertion to Supabase (exclude local-only `id`)
+        const rows = newTrades.map((t) => ({
+          timestamp: t.timestamp,
+          asset: t.asset,
+          side: t.side,
+          quantity: t.quantity,
+          entry_price: t.entry_price,
+          exit_price: t.exit_price,
+          profit_loss: t.profit_loss,
+          balance: t.balance,
+        }));
+
+        // Filter out invalid rows that would violate DB constraints
+        const validRows = rows.filter(
+          (r) =>
+            r.timestamp &&
+            r.asset &&
+            (r.side === 'buy' || r.side === 'sell') &&
+            Number.isFinite(r.quantity) &&
+            Number.isFinite(r.entry_price) &&
+            Number.isFinite(r.exit_price) &&
+            r.quantity > 0 &&
+            r.entry_price > 0 &&
+            r.exit_price > 0
+        );
+
+        if (validRows.length > 0) {
+          const { error } = await supabase.from('trades').insert(validRows);
+          if (error) {
+            console.error('Error inserting trades to supabase:', error);
+          }
+        }
+      } catch (err) {
+        console.error('Error uploading trades to supabase:', err);
+      }
+
+      await loadRemoteTrades(session.user.id);
     }
   };
 
   const handleTradeAdded = async (trade: Trade) => {
     try {
       await appendTradesLocal([trade]);
-      await loadTrades();
+      await loadLocalTrades();
     } catch (e) {
       console.error('Error adding trade locally:', e);
       alert('Error adding trade locally.');
     }
 
     if (session?.user?.id) {
-      await loadTrades(session.user.id);
+      await loadRemoteTrades(session.user.id);
     }
   };
 
@@ -186,22 +218,12 @@ function App() {
 
   if (!session) {
     return (
-      <AuthForm
-        onSignIn={handleSignIn}
-        onSignUp={handleSignUp}
-        loading={authSubmitLoading}
-        error={authError}
-      />
+      <AuthForm onSignIn={handleSignIn} onSignUp={handleSignUp} loading={authSubmitLoading} error={authError} />
     );
   }
 
   return (
-    <Layout
-      currentPage={currentPage}
-      onNavigate={setCurrentPage}
-      onSignOut={handleSignOut}
-      userEmail={session.user.email || ''}
-    >
+    <Layout currentPage={currentPage} onNavigate={setCurrentPage} onSignOut={handleSignOut} userEmail={session.user.email || ''}>
       {currentPage === 'dashboard' ? (
         <div className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

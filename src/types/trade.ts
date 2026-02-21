@@ -30,18 +30,6 @@ export interface BiasAnalysisResult {
   revengeTrading: BiasResultItem;
 }
 
-export interface BiasDetection {
-  detected: boolean;
-  severity: 'low' | 'medium' | 'high';
-  message: string;
-}
-
-export interface BiasAnalysisResult {
-  overtrading: BiasDetection;
-  lossAversion: BiasDetection;
-  revengeTrading: BiasDetection;
-}
-
 // biasDetector.ts
 export const analyzeTrades = (trades: Trade[]) => {
   const sortedTrades = [...trades].sort((a, b) => 
