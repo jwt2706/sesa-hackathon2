@@ -1,10 +1,12 @@
+import { ReactNode } from 'react';
 import { Trade } from '../../types/trade';
 
 interface PLCardProps {
   trades: Trade[];
+  children?: ReactNode;
 }
 
-export default function PLCard({ trades }: PLCardProps) {
+export default function PLCard({ trades, children }: PLCardProps) {
   const totalPL = trades.reduce((acc, t) => acc + (t.profit_loss || 0), 0);
 
   const formatted = (v: number) =>
@@ -19,9 +21,7 @@ export default function PLCard({ trades }: PLCardProps) {
         </p>
       </div>
 
-      <div className="mt-4 text-sm text-gray-700 font-medium">
-        <p>{trades.length} trades analyzed</p>
-      </div>
+      {children ? <div className="mt-5 pt-5 border-t-2 border-gray-300">{children}</div> : null}
     </div>
   );
 }

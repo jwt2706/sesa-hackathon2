@@ -130,14 +130,103 @@ interface AnalysisPageProps {
 }
 
 export default function AnalysisPage({ trades, analysis }: AnalysisPageProps) {
+  const severityWeight = (severity?: string) => {
+    if (severity === 'high') return 3;
+    if (severity === 'medium') return 2;
+    return 1;
+  };
+
+  const biasScores = analysis
+    ? [
+        {
+          key: 'overtrading' as const,
+          label: 'overtrading',
+          score: (analysis.overtrading.detected ? 2 : 0) + severityWeight(analysis.overtrading.severity),
+        },
+        {
+          key: 'lossAversion' as const,
+          label: 'loss aversion',
+          score: (analysis.lossAversion.detected ? 2 : 0) + severityWeight(analysis.lossAversion.severity),
+        },
+        {
+          key: 'revengeTrading' as const,
+          label: 'revenge trading',
+          score: (analysis.revengeTrading.detected ? 2 : 0) + severityWeight(analysis.revengeTrading.severity),
+        },
+      ]
+    : [];
+
+  const dominantBias = biasScores.length > 0 ? [...biasScores].sort((a, b) => b.score - a.score)[0] : null;
+
+  const recommendationsByBias: Record<string, string[]> = {
+    overtrading: [
+      'Set a strict max number of trades per day.',
+      'Require a checklist before every trade entry.',
+      'Pause 10 minutes after each closed trade.',
+    ],
+    lossAversion: [
+      'Use hard stop-loss orders on every position.',
+      'Predefine exit rules before entering trades.',
+      'Review losers weekly to enforce discipline.',
+    ],
+    revengeTrading: [
+      'Take a mandatory cooling-off break after a loss.',
+      'Reduce position size after consecutive losses.',
+      'Trade only when setup quality is high and documented.',
+    ],
+    default: [
+      'Keep position sizing consistent with your plan.',
+      'Track outcomes and adjust rules monthly.',
+      'Protect capital first, then optimize returns.',
+    ],
+  };
+
+  const recommendations = dominantBias
+    ? recommendationsByBias[dominantBias.key] || recommendationsByBias.default
+    : recommendationsByBias.default;
+
+  const hasDetectedBias = analysis
+    ? analysis.overtrading.detected || analysis.lossAversion.detected || analysis.revengeTrading.detected
+    : false;
+
   return (
     <div className="backdrop-blur-xl bg-white/75 border-2 border-gray-300 rounded-2xl p-6 shadow-xl space-y-8">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Analysis Results:</h2>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8 border-b-2 border-gray-300">
-        <PLCard trades={trades} />
+      <div className="space-y-6 pb-8 border-b-2 border-gray-300">
+        <PLCard trades={trades}>
+          <p className="text-gray-900 font-bold text-lg leading-snug">
+            Bro, you're{' '}
+            <span className={hasDetectedBias ? 'text-red-700' : 'text-green-700'}>
+              {hasDetectedBias && dominantBias ? `${dominantBias.label}` : 'healthy and disciplined'}
+            </span>
+            .
+          </p>
+          {analysis ? (
+            <p className="text-sm text-gray-700 font-medium mt-2 leading-relaxed">
+              {hasDetectedBias && dominantBias?.key === 'overtrading'
+                ? analysis.overtrading.message
+                : hasDetectedBias && dominantBias?.key === 'lossAversion'
+                ? analysis.lossAversion.message
+                : hasDetectedBias && dominantBias?.key === 'revengeTrading'
+                ? analysis.revengeTrading.message
+                : 'No strong bias detected from current data. Keep following your plan and risk rules.'}
+            </p>
+          ) : null}
+
+          <h3 className="text-lg font-bold text-gray-900 mt-4 mb-3">Recommendations</h3>
+          <ul className="space-y-2.5">
+            {recommendations.map((item) => (
+              <li key={item} className="text-sm text-gray-800 font-medium leading-relaxed flex items-start gap-2">
+                <span className={`${hasDetectedBias ? 'text-red-600' : 'text-green-600'} font-bold`}>•</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </PLCard>
+
         <SentimentGraphCard trades={trades} />
       </div>
 
