@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import UploadTrades from './components/UploadTrades';
-import ManualTradeEntry from './components/ManualTradeEntry';
-import TradesTable from './components/TradesTable';
-import AnalysisDashboard from './components/AnalysisDashboard';
 import FAQPage from './components/FAQPage';
 import AuthForm from './components/AuthForm';
 import { Trade, BiasAnalysisResult } from './types/trade';
@@ -217,12 +214,7 @@ function App() {
         <div className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <UploadTrades onTradesUploaded={handleTradesUploaded} />
-            <ManualTradeEntry onTradeAdded={handleTradeAdded} />
           </div>
-
-          <AnalysisDashboard analysis={analysis} />
-
-          <TradesTable trades={trades} />
         </div>
       ) : (
         <FAQPage />
